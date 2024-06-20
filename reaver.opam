@@ -36,8 +36,8 @@ build: [
 dev-repo: "git+https://github.com/PaulRaUnite/reaver.git"
 pin-depends: [
   ["ocamlyices.0.7.4" "git+https://github.com/paulraunite/ocamlyices"]
-  ["camllib.1.4.0" "./vendor/camllib"]
-  ["fixpoint.2.3.3" "./vendor/fixpoint"]
+  ["camllib.1.4.0" "git+https://github.com/paulraunite/camllib"]
+  ["fixpoint.2.3.3" "git+https://github.com/paulraunite/fixpoint"]
   ["ocamlqsopt_ex.0.9.4" "./vendor/ocamlqsopt_ex"]
-  ["bddapron.2.4.0" "./vendor/bddapron"]
+  ["bddapron.2.4.0" "git+https://github.com/paulraunite/bddapron"]
 ]
