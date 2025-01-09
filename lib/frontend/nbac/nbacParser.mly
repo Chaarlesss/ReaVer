@@ -302,6 +302,7 @@ expr:
 expr1:
   expr2 { $1 }
 | expr1 TK_OR expr2   { Binop(`Bool(Or),$1,$3) }
+| expr1 TK_IMPLY expr2  { Binop(`Bool(Or),Unop(`Not,$1),$3) }
 expr2:
   expr3 { $1 }
 | expr2 TK_AND expr3  { Binop(`Bool(And),$1,$3) }
