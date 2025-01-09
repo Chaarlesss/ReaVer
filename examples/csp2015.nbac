@@ -1,0 +1,27 @@
+state
+    init: bool;
+    ok: bool;
+    in1_i, in2_i, proc_i, out_i, anon_i: int;
+    anonout_turn : bool;
+input
+    in1, in2, proc, out, anon: bool;
+local
+    in1_in, in2_in, proc_in, out_in, anon_in: int;
+definition
+    in1_in = if init then 0 else in1_i + (if in1 then 1 else 0);
+    in2_in = if init then 0 else in2_i + (if in2 then 1 else 0);
+    proc_in = if init then 0 else proc_i + (if proc then 1 else 0);
+    out_in = if init then 0 else out_i + (if out then 1 else 0);
+    anon_in = if init then 0 else anon_i + (if anon then 1 else 0);
+transition
+    in1_i' = in1_in;
+    in2_i' = in2_in;
+    proc_i' = proc_in;
+    out_i' = out_in;
+    anon_i' = anon_in;
+    anonout_turn' = if init then false else if anon then true else if out then false else anonout_turn;
+    init' = false;
+    ok' = if init then true else ok and (in1_in-proc_in <= 1) and (in2_in-proc_in <= 1);
+assertion ((in1_i=proc_i => not proc) and (in2_i=proc_i => not proc) and (proc_i=out_i => not out) and ((in1_i >= in2_i and in1) or (in2_i >= in1_i and in2)) = anon and (not anonout_turn => not out) and (anonout_turn => not anon)) or init;
+initial init;
+final not (init or ok);

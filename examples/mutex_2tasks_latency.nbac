@@ -1,0 +1,17 @@
+state
+    init,ok : bool;
+    taken: bool;
+    ref_c: int;
+
+input
+    s1,f1,s2,f2,ref: bool;
+
+
+transition
+  init' = false;
+  taken' = (s1 or s2) and not (f1 or f2);
+  ref_c = if init then 0 else ref_c + (if ref then 1 else 0);
+  ok' = 
+
+initial init;
+invariant init or ok;

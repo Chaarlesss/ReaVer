@@ -1,0 +1,33 @@
+state
+    init: bool;
+    ok: bool;
+    ai,bi,ci,ui: int;
+    uc_turn : bool;
+
+input
+    a,b,c,u: bool;
+
+local
+    ain,bin,cin,uin: int;
+
+definition
+    ain = if init then 0 else ai + (if a then 1 else 0);
+    bin = if init then 0 else bi + (if b then 1 else 0);
+    cin = if init then 0 else ci + (if c then 1 else 0);
+    uin = if init then 0 else ui + (if u then 1 else 0);
+
+
+transition
+    ai' = ain;
+    bi' = bin;
+    ci' = cin;
+    ui' = uin;
+    uc_turn' = if init then false else if u then true else if c then false else uc_turn;
+    init' = false;
+    ok' = if init then true else ok and (ai-ci <= 1) and (bi-ci <= 1);
+    
+assertion ((bi=ci => not (c and not b)) and (u = (a and b)) and (not uc_turn => not c) and (uc_turn => not u) and (ai=ci => not (c and not a))) or init;
+
+initial init;
+final not (init or ok);
+

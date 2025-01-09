@@ -1,0 +1,41 @@
+
+state
+    init: bool;
+    ok: bool;
+    t_i,td_i,r_i,min_i,max_i: int;
+    minr_sampled,tmin_delay0,tmin_delay1: bool;
+    maxr_sampled,tmax_delay0,tmax_delay1,tmax_delay2: bool;
+
+input
+    t,td,r,min,max: bool;
+
+local
+    t_in,td_in,r_in,min_in,max_in: int;
+
+definition
+    t_in = if init then 0 else t_i + (if t then 1 else 0);
+    td_in = if init then 0 else td_i + (if td then 1 else 0);
+    r_in = if init then 0 else r_i + (if r then 1 else 0);
+    min_in = if init then 0 else min_i + (if min then 1 else 0);
+    max_in = if init then 0 else max_i + (if max then 1 else 0);
+
+transition
+    init' = false;
+    t_i' = t_in;
+    td_i' = td_in;
+    r_i' = r_in;
+    max_i' = max_in;
+    min_i' = min_in;
+    minr_sampled' = if init then false else if r then false else (minr_sampled or min);
+    tmin_delay0' = if init then false else if r then (minr_sampled or min) else tmin_delay0;
+    tmin_delay1' = if init then false else if r then tmin_delay0 else tmin_delay1;
+    maxr_sampled' = if init then false else if r then false else (maxr_sampled or max);
+    tmax_delay0' = if init then false else if r then (maxr_sampled or max) else tmax_delay0;
+    tmax_delay1' = if init then false else if r then tmax_delay0 else tmax_delay1;
+    tmax_delay2' = if init then false else if r then tmax_delay1 else tmax_delay2;
+    ok' = if init then true else (ok and min_in - max_in <= 1 and max_in - min_in <= 1);
+assertion ((min = (r and tmin_delay1)) and (max = (r and tmax_delay2)) and (t_i < 1 => not td) and (t_i >= 1 => t = td) and (td_i=min_i => not td) and (td_i=max_i => not max)) or init;
+initial init;
+final not (init or ok);
+
+

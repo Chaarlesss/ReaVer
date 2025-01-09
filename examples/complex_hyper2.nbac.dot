@@ -1,0 +1,16 @@
+digraph G {
+  
+  -3 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-3) not init and ok"];
+  -1 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-1) init"];
+  -2 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-2) not init and not ok"];
+  3 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(3) \nnot nm and 35nm_i-r_i+34<>0 ornot r and 35nm_i-r_i+34=0 ornm and r and 35nm_i-r_i+34=0 -->\ninit'=false; m_i'={ m_i+1 IF m, m_i IF not m }; n_i'={ n_i+1 IF n, n_i IF not n }; nm_i'={ nm_i+1 IF nm, nm_i IF not nm }; ok'=not nm and not r orr; r_i'={ r_i+1 IF r, r_i IF not r }; "];
+  5 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(5) \nnm and 35nm_i-r_i+34<>0 or not nm and r and 35nm_i-r_i+34=0 -->\ninit'=false; m_i'={ m_i+1 IF m, m_i IF not m }; n_i'={ n_i+1 IF n, n_i IF not n }; nm_i'={ nm_i+1 IF nm, nm_i IF not nm }; ok'=false; r_i'={ r_i+1 IF r,r_i IF not r }; "];
+  4 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(4) \ninit'=false; m_i'=0; n_i'=0; nm_i'=0; ok'=true; r_i'=0; "];
+  -3 -> 3;
+  3 -> -3;
+  -3 -> 5;
+  5 -> -2;
+  -1 -> 4;
+  4 -> -3;
+  
+}

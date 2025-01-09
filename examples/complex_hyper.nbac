@@ -1,0 +1,28 @@
+state
+    init: bool;
+    ok: bool;
+    ri,ni,mi,nmi: int;
+
+input
+    r,n,m,nm: bool;
+
+local
+    neri,neni,nemi,nenmi: int;
+
+definition
+    neri = if init then 0 else ri + (if r then 1 else 0);
+    neni = if init then 0 else ni + (if n then 1 else 0);
+    nemi = if init then 0 else mi + (if m then 1 else 0);
+    nenmi = if init then 0 else nmi + (if nm then 1 else 0);
+
+transition
+    init' = false;
+    ri' = neri;
+    ni' = neni;
+    mi' = nemi;
+    nmi' = nenmi;
+    ok' = if init then true else (ok and (nm = (neri = 35*nenmi)));
+assertion ((neri=7*neni)=n and (neri=5*nemi)=m and ((n and m) = nm)) or init;
+initial init;
+final not (init or ok);
+

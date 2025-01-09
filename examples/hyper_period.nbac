@@ -1,0 +1,22 @@
+state
+    init: bool;
+    ok: bool;
+    ri: int;
+
+input
+    r,n,m,nm: bool;
+
+local
+    nri: int;
+
+definition
+    nri = if init then 0 else ri + (if r then 1 else 0);
+
+transition
+    init' = false;
+    ri' = nri;
+    ok' = if init then true else (ok and (nri = 35 => nm));
+assertion ((nri=7 => n) and (nri=5 => m) and ((n and m) = nm)) or init;
+initial init;
+final not (init or ok);
+

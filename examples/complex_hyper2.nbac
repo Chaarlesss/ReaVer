@@ -1,0 +1,28 @@
+state
+    init: bool;
+    ok: bool;
+    r_i,n_i,m_i,nm_i: int;
+
+input
+    r,n,m,nm: bool;
+
+local
+    n_in,m_in,nm_in,r_in: int;
+
+definition
+    r_in = if init then 0 else r_i + (if r then 1 else 0);
+    n_in = if init then 0 else n_i + (if n then 1 else 0);
+    m_in = if init then 0 else m_i + (if m then 1 else 0);
+    nm_in = if init then 0 else nm_i + (if nm then 1 else 0);
+
+transition
+    init' = false;
+    r_i' = r_in;
+    n_i' = n_in;
+    m_i' = m_in;
+    nm_i' = nm_in;
+    ok' = if init then true else (ok and (r_i=35*(nm_i+1)-1 => nm=r) and (r_i<>35*(nm_i+1)-1 => not nm));
+assertion ((r_i=7*(n_i+1)-1 => n=r) and (r_i<>7*(n_i+1)-1 => not n) and (r_i=5*(m_i+1)-1 => m=r) and (r_i<>5*(m_i+1)-1 => not m) and ((n and m) = nm)) or init;
+initial init;
+final not (init or ok);
+

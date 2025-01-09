@@ -1,0 +1,24 @@
+state
+    init: bool;
+    ok: bool;
+    ai,bi: int;
+
+input
+    a,b: bool;
+
+local
+    nai,nbi: int;
+
+definition
+    nai = if init then 0 else ai + (if a then 1 else 0);
+    nbi = if init then 0 else bi + (if b then 1 else 0);
+
+
+transition
+    ai' = nai;
+    bi' = nbi;
+    init' = false;
+    ok' = (nai >= nbi);
+assertion ((ai=bi => not b)) or init;
+initial init;
+final not (init or ok);

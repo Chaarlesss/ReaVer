@@ -1,0 +1,17 @@
+state
+    init: bool;
+    ok: bool;
+    ai,bi,ci: int;
+
+input
+    a,b,c: bool;
+
+transition
+    ai' = if init then 0 else ai + (if a then 1 else 0);
+    bi' = if init then 0 else bi + (if b then 1 else 0);
+    ci' = if init then 0 else ci + (if c then 1 else 0);
+    init' = false;
+    ok' = if init then true else (ok and (ai >= ci) and (ai = ci => not c));
+assertion ((ai=bi => not b) and (bi=ci => not c) and ai>=bi and bi>=ci) or init;
+initial init;
+final not (init or ok);

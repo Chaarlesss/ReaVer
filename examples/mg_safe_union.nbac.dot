@@ -1,0 +1,16 @@
+digraph G {
+  
+  -3 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-3) not init and ok"];
+  -1 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-1) init"];
+  -2 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-2) not init and not ok"];
+  3 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(3) \n-ai+ci+1>=0 and -bi+ci+1>=0 -->\nai'={ ai+1 IF a, ai IF not a }; bi'={ bi+1 IF b, bi IF not b }; ci'={ ci+1 IF c, ci IF not c }; init'=false; ok'=true; ui'={ ui+1 IF u,ui IF not u }; "];
+  5 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(5) \nbi-ci-2>=0 or ai-ci-2>=0 and -bi+ci+1>=0 -->\nai'={ ai+1 IF a, ai IF not a }; bi'={ bi+1 IF b, bi IF not b }; ci'={ ci+1 IF c, ci IF not c }; init'=false; ok'=false; ui'={ ui+1 IF u,ui IF not u }; "];
+  4 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(4) \nai'=0; bi'=0; ci'=0; init'=false; ok'=true; ui'=0; "];
+  -3 -> 3;
+  3 -> -3;
+  -3 -> 5;
+  5 -> -2;
+  -1 -> 4;
+  4 -> -3;
+  
+}

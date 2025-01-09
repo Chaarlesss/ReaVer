@@ -1,0 +1,21 @@
+state
+    init: bool;
+    ok: bool;
+    ai,bi,ci: int;
+input
+    a,b,c: bool;
+local
+    ain,bin,cin: int;
+definition
+    ain = if init then 0 else ai + (if a then 1 else 0);
+    bin = if init then 0 else bi + (if b then 1 else 0);
+    cin = if init then 0 else ci + (if c then 1 else 0);
+transition
+    ai' = ain;
+    bi' = bin;
+    ci' = cin;
+    init' = false;
+    ok' = if init then true else (ok and (ain >= cin) and (ai = ci => not c));
+assertion ((ai=bi => not b) and (bi=ci => not c) and ai>=bi) or init;
+initial init;
+final not (init or ok);

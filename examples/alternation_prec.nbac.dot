@@ -1,0 +1,29 @@
+digraph G {
+  
+  -4 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-4) not ab_turn and not init and ok"];
+  -1 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-1) init"];
+  -5 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-5) ab_turn and not init and ok"];
+  -2 [shape=box,fontsize=10,height=0.01,width=0.01,label="(-2) not init and not ok"];
+  6 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(6) \nnot a and a_i-b_i>=0 and -a_i+b_i+1>=0 -->\na_i'=a_i; ab_turn'=false; b_i'={ b_i+1 IF b, b_i IF not b }; init'=false; ok'=a_i-b_i<>0 or not b and a_i-b_i=0; "];
+  8 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(8) \nnot b and a_i-b_i>=0 and -a_i+b_i+1>=0 -->\na_i'={ a_i+1 IF a, a_i IF not a }; ab_turn'=true; b_i'=b_i; init'=false; ok'=true; "];
+  7 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(7) \nb and a_i-b_i>=0 and a_i-b_i<>0 and -a_i+b_i+1>=0 -->\na_i'={ a_i+1 IF a, a_i IF not a }; ab_turn'=a; b_i'=b_i+1; init'=false; ok'=true; "];
+  12 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(12) \na_i-b_i-2>=0 orb and a_i-b_i>=0 and a_i-b_i=0 and -a_i+b_i+1>=0 or-a_i+b_i-1>=0 and -a_i+b_i+1>=0 -->\na_i'={ a_i+1 IF a, a_i IF not a }; ab_turn'=not b or a and b; b_i'={ b_i+1 IF b, b_i IF not b }; init'=false; ok'=false; "];
+  9 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(9) \na and a_i-b_i>=0 and -a_i+b_i+1>=0 -->\na_i'=a_i+1; ab_turn'=true; b_i'={ b_i+1 IF b, b_i IF not b }; init'=false; ok'=a_i-b_i<>0 or not b and a_i-b_i=0; "];
+  11 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(11) \na_i-b_i-2>=0 or -a_i+b_i-1>=0 and -a_i+b_i+1>=0 -->\na_i'={ a_i+1 IF a, a_i IF not a }; ab_turn'=a; b_i'={ b_i+1 IF b, b_i IF not b }; init'=false; ok'=false; "];
+  10 [shape=plaintext,fontsize=10,height=0.01,width=0.01,label="(10) \na_i'=0; ab_turn'=false; b_i'=0; init'=false; ok'=true; "];
+  -4 -> 6;
+  6 -> -4;
+  -5 -> 8;
+  8 -> -5;
+  -5 -> 7;
+  7 -> -4;
+  -5 -> 12;
+  12 -> -2;
+  -4 -> 9;
+  9 -> -5;
+  -4 -> 11;
+  11 -> -2;
+  -1 -> 10;
+  10 -> -4;
+  
+}

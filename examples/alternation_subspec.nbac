@@ -1,0 +1,31 @@
+state
+    init: bool;
+    ok: bool;
+    a_i,b_i,alpha_i: int;
+    ab_turn : bool;
+
+input
+    a,b,alpha: bool;
+
+local
+    a_in,b_in,alpha_in: int;
+
+definition
+    a_in = if init then 0 else a_i + (if a then 1 else 0);
+    b_in = if init then 0 else b_i + (if b then 1 else 0);
+    alpha_in = if init then 0 else alpha_i + (if alpha then 1 else 0);
+
+
+transition
+    a_i' = a_in;
+    b_i' = b_in;
+    alpha_i' = alpha_in;
+    ab_turn' = if init then false else if a then true else if b then false else ab_turn;
+    init' = false;
+    ok' = if init then true else ok and (not ab_turn => not b) and (ab_turn => not a);
+
+assertion ((a_i = b_i => not b) and (b_i=alpha_i => not alpha) and (a_i < 1 => not alpha) and (a_i >= 1 => (a = alpha and a_i = alpha_i + 1)) and (a_i <= alpha_i+1)) or init;
+
+initial init;
+final not (init or ok);
+
