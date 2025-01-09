@@ -20,8 +20,6 @@
   camllib
   bddapron
   (apron (>= 0.9.15))
-  ocamlyices
-  ocamlqsopt_ex
   fixpoint
   (odoc :with-doc)
   (alcotest :with-test)))

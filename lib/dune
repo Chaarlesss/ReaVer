@@ -1,7 +1,7 @@
 (library
  (name reaver)
  (public_name reaver)
- (libraries cudd gmp ocamlqsopt_ex fixpoint ocamlyices bddapron.bddapron apron.apron apron.polkaMPQ apron.octMPQ apron.boxMPQ bddapron.bdd str)
+ (libraries cudd gmp fixpoint bddapron.bddapron apron.apron apron.polkaMPQ apron.octMPQ apron.boxMPQ bddapron.bdd str)
  (wrapped false)
  (modules (:standard \ stratiter stratiter2 stratiter3 powerCons)))
 

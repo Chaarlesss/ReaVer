@@ -8,3 +8,4 @@ _release
 *.install
 .idea/
 .vscode/
+_opam
