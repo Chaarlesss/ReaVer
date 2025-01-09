@@ -30,3 +30,9 @@ Using script that calls built docker image:
 ```bash
 ./run.sh <filepath> [-s <strategy instructions from the PDF guide above>]
 ```
+
+### From inside the container
+
+```bash
+cat ./examples/<filename>.nbac | dune exec reaver -- -s "aB;aB:b;pIF;pMD;rT;aS" -debug_force DEBUG -inputformat nbac
+```
