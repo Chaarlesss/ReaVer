@@ -149,7 +149,7 @@ let rec make_yexpr ctx = function
   T             -> mk_true ctx.context
 | F             -> mk_false ctx.context
 | Bool v        -> mk_bool_var ctx.context v
-| Let(v,f)     -> mk_eq ctx.context (mk_bool_var ctx.context v) (make_yexpr ctx f)
+| Let(v,f)      -> mk_eq ctx.context (mk_bool_var ctx.context v) (make_yexpr ctx f)
 | And(f1,f2)    -> mk_and ctx.context [| make_yexpr ctx f1; make_yexpr ctx f2 |]
 | Not f         -> mk_not ctx.context (make_yexpr ctx f)
 | Or(f1,f2)     -> mk_or ctx.context [| make_yexpr ctx f1; make_yexpr ctx f2 |]
