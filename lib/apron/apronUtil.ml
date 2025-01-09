@@ -299,7 +299,7 @@ let get_translator man eqs g ivars =
 (******************************************************************************)
 let lincons0_is_eq c1 c2 =
   (c1.Apron.Lincons0.typ = c2.Apron.Lincons0.typ) &&
-  ((Apron.Linexpr0.compare 
+  ((Apron.Linexpr0.cmp 
       c1.Apron.Lincons0.linexpr0 c2.Apron.Lincons0.linexpr0)=0)
 
 let linconss_is_eq a1 a2 =
