@@ -1,8 +1,0 @@
-(test
- (name essai)
- (libraries latticeAutomata))
-
-(env
- (dev
-  (flags
-   (:standard -warn-error -A))))
