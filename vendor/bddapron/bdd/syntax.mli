@@ -8,25 +8,33 @@
 (*  ********************************************************************** *)
 
 (** Constant *)
-type cst = [
-  | `Bool of bool
+type cst =
+  [ `Bool of bool
   | `Bint of (bool * int) * int
-]
+  ]
 
 (** Unary operators *)
-type unop = [
-  | `Not
+type unop =
+  [ `Not
   | `Negate
-]
+  ]
 
 (** Boolean/finite-type binary operators *)
-type bbinop = Or | And | EQ | NEQ | GT | GEQ | LEQ | LT
+type bbinop =
+  | Or
+  | And
+  | EQ
+  | NEQ
+  | GT
+  | GEQ
+  | LEQ
+  | LT
 
 (** Binary operators *)
-type binop = [
-| `Bool of bbinop
-| `Apron of Apron.Texpr1.binop * Apron.Texpr1.typ * Apron.Texpr1.round
-]
+type binop =
+  [ `Bool of bbinop
+  | `Apron of Apron.Texpr1.binop * Apron.Texpr1.typ * Apron.Texpr1.round
+  ]
 
 (** Expressions *)
 type 'a expr =
@@ -45,25 +53,37 @@ val print_cst : Format.formatter -> cst -> unit
 val print_unop : Format.formatter -> unop -> unit
 val print_bbinop : Format.formatter -> bbinop -> unit
 val print_binop : Format.formatter -> binop -> unit
-val print_expr :
-  (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> 'a expr -> unit
+val print_expr : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a expr -> unit
 
 (*  ********************************************************************** *)
-(** {3 Translation functions} *)
+
 (*  ********************************************************************** *)
+
+(** {3 Translation functions} *)
 exception Error of string
-  (** Exception raised in case of typing error *)
+(** Exception raised in case of typing error *)
 
 val to_expr0 : 'a Env.t -> 'a Cond.t -> 'a expr -> 'a Expr0.t
 val to_expr1 : 'a Env.t -> 'a Cond.t -> 'a expr -> 'a Expr1.t
 val to_listexpr1 : 'a Env.t -> 'a Cond.t -> 'a expr list -> 'a Expr1.List.t
-val to_listexpr2 :
-  ?normalize:bool -> ?reduce:bool -> ?careset:bool ->
-  'a Env.t -> 'a Cond.t -> 'a expr list -> 'a Expr2.List.t
-val to_boolexpr2 :
-  ?normalize:bool -> ?reduce:bool -> ?careset:bool ->
-  'a Env.t -> 'a Cond.t -> 'a expr -> 'a Expr2.Bool.t
+
+val to_listexpr2
+  :  ?normalize:bool
+  -> ?reduce:bool
+  -> ?careset:bool
+  -> 'a Env.t
+  -> 'a Cond.t
+  -> 'a expr list
+  -> 'a Expr2.List.t
+
+val to_boolexpr2
+  :  ?normalize:bool
+  -> ?reduce:bool
+  -> ?careset:bool
+  -> 'a Env.t
+  -> 'a Cond.t
+  -> 'a expr
+  -> 'a Expr2.Bool.t
 
 (*  ********************************************************************** *)
 (** {3 Internal functions} *)
@@ -71,14 +91,17 @@ val to_boolexpr2 :
 
 val error : ('a, Format.formatter, unit, 'b) format4 -> 'a
 val is_zero : 'a expr -> bool
-
 val precedence_of_unop : unop -> int
 val precedence_of_binop : binop -> int
 val precedence_of_expr : 'a expr -> int
-
 val cst_to_expr0 : 'a Env.t -> 'a Cond.t -> [< cst ] -> 'a Expr0.expr
-val apply_bbinop :
-  'a Env.t -> 'a Cond.t ->
-  bbinop -> 'a Expr0.expr -> 'a Expr0.expr -> 'a Expr0.Bool.t
-val apply_binop :
-  'a Env.t -> 'a Cond.t -> binop -> 'a Expr0.t -> 'a Expr0.t -> 'a Expr0.t
+
+val apply_bbinop
+  :  'a Env.t
+  -> 'a Cond.t
+  -> bbinop
+  -> 'a Expr0.expr
+  -> 'a Expr0.expr
+  -> 'a Expr0.Bool.t
+
+val apply_binop : 'a Env.t -> 'a Cond.t -> binop -> 'a Expr0.t -> 'a Expr0.t -> 'a Expr0.t

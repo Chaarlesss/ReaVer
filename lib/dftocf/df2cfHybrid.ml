@@ -7,24 +7,31 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
-let logger = {Log.fmt=Format.std_formatter; 
-              Log.module_name="Df2cfHybrid";
-              Log.level=Log.Debug3}
+let logger =
+  { Log.fmt = Format.std_formatter
+  ; Log.module_name = "Df2cfHybrid"
+  ; Log.level = Log.Debug3
+  }
+;;
 
 exception InvalidZeroSemantics of string
 
-type param_t = {disc_sem : ZeroTrans.sem_t; 
-                cont_sem : ZeroTrans.sem_t; }
+type param_t =
+  { disc_sem : ZeroTrans.sem_t
+  ; cont_sem : ZeroTrans.sem_t
+  }
 
 let str_to_sem str =
   match str with
-    |"AtZero" -> ZeroTrans.AtZero
-    |"Contact" -> ZeroTrans.Contact
-    |"Crossing" -> ZeroTrans.Crossing
-    |s -> raise (InvalidZeroSemantics s)
+  | "AtZero" -> ZeroTrans.AtZero
+  | "Contact" -> ZeroTrans.Contact
+  | "Crossing" -> ZeroTrans.Crossing
+  | s -> raise (InvalidZeroSemantics s)
+;;
 
-let make_param disc_sem cont_sem = {disc_sem; cont_sem}
+let make_param disc_sem cont_sem = { disc_sem; cont_sem }
 
 (* translates a hybrid DF program to a CFG *)
-let transform param env dfprog = 
+let transform param env dfprog =
   ZeroTrans.translate env dfprog param.disc_sem param.cont_sem
+;;

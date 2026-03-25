@@ -1,20 +1,19 @@
 (** Union-find Abstract Data Types *)
 
+(** The type of the data structure storing set membership (the universe) *)
 type 'a t
-        (** The type of the data structure storing set membership (the universe) *)
 
-val create: int -> 'a t
-        (** Create a new universe set *)
+(** Create a new universe set *)
+val create : int -> 'a t
 
-val add:  'a t -> 'a -> unit
-        (** Add an element to the universe (initially belonging to its singleton) *)
+(** Add an element to the universe (initially belonging to its singleton) *)
+val add : 'a t -> 'a -> unit
 
-val find: 'a t -> 'a -> 'a
-        (* Find the set of an element *)
+val find : 'a t -> 'a -> 'a
+(* Find the set of an element *)
 
-val union: 'a t -> 'a -> 'a -> 'a
-        (** Computes the union of two sets and returns the resulting set *)
+(** Computes the union of two sets and returns the resulting set *)
+val union : 'a t -> 'a -> 'a -> 'a
 
-val extract: 'a t -> 'a list list
-        (** Extract the list of sets *)
-
+(** Extract the list of sets *)
+val extract : 'a t -> 'a list list

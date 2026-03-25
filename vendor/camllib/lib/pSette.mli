@@ -16,54 +16,55 @@
     y -> Stdlib.compare x y in ...].
 *)
 
-type 'a t = {
-  compare : 'a -> 'a -> int;
-  set : 'a Sette.t;
-}
+type 'a t =
+  { compare : 'a -> 'a -> int
+  ; set : 'a Sette.t
+  }
+
+(** The empty set. *)
 val empty : ('a -> 'a -> int) -> 'a t
-    (** The empty set. *)
 
-val is_empty: 'a t -> bool
-    (** Test whether a set is empty or not. *)
+(** Test whether a set is empty or not. *)
+val is_empty : 'a t -> bool
 
-val mem: 'a -> 'a t -> bool
-    (** [mem x s] tests whether [x] belongs to the set [s]. *)
+(** [mem x s] tests whether [x] belongs to the set [s]. *)
+val mem : 'a -> 'a t -> bool
 
-val add: 'a -> 'a t -> 'a t
-    (** [add x s] returns a set containing all elements of [s],
+(** [add x s] returns a set containing all elements of [s],
 	plus [x]. If [x] was already in [s], [s] is returned unchanged. *)
+val add : 'a -> 'a t -> 'a t
 
-val singleton: ('a -> 'a -> int) -> 'a -> 'a t
-    (** [singleton x] returns the one-element set containing only [x]. *)
+(** [singleton x] returns the one-element set containing only [x]. *)
+val singleton : ('a -> 'a -> int) -> 'a -> 'a t
 
-val remove: 'a -> 'a t -> 'a t
-    (** [remove x s] returns a set containing all elements of [s], except
+(** [remove x s] returns a set containing all elements of [s], except
 	[x]. If [x] was not in [s], [s] is returned unchanged. *)
+val remove : 'a -> 'a t -> 'a t
 
-val union: 'a t -> 'a t -> 'a t
-val inter: 'a t -> 'a t -> 'a t
-val diff: 'a t -> 'a t -> 'a t
-	(** Union, intersection and set difference. *)
+val union : 'a t -> 'a t -> 'a t
+val inter : 'a t -> 'a t -> 'a t
 
-val compare: 'a t -> 'a t -> int
-    (** Total ordering between sets. Can be used as the ordering function
+(** Union, intersection and set difference. *)
+val diff : 'a t -> 'a t -> 'a t
+
+(** Total ordering between sets. Can be used as the ordering function
 	for doing sets of sets. *)
+val compare : 'a t -> 'a t -> int
 
-val equal: 'a t -> 'a t -> bool
-    (** [equal s1 s2] tests whether the sets [s1] and [s2] are
+(** [equal s1 s2] tests whether the sets [s1] and [s2] are
 	equal, that is, contain equal elements. *)
+val equal : 'a t -> 'a t -> bool
 
-val subset: 'a t -> 'a t -> bool
-    (** [subset s1 s2] tests whether the set [s1] is a subset of
+(** [subset s1 s2] tests whether the set [s1] is a subset of
 	the set [s2]. *)
+val subset : 'a t -> 'a t -> bool
 
-val iter: ('a -> unit) -> 'a t -> unit
-    (** [iter f s] applies [f] in turn to all elements of [s].
+(** [iter f s] applies [f] in turn to all elements of [s].
 	The order in which the elements of [s] are presented to [f]
 	is unspecified. *)
+val iter : ('a -> unit) -> 'a t -> unit
 
-val fold: ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-    (** [fold f s a] computes [(f xN ... (f x2 (f x1 a))...)],
+(** [fold f s a] computes [(f xN ... (f x2 (f x1 a))...)],
 	where [x1 ... xN] are the elements of [s].
 	The order in which elements of [s] are presented to [f] is
 	unspecified.
@@ -73,51 +74,55 @@ val fold: ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 	@return the computed accumulator
 	@raise Not_found if no fount
     *)
+val fold : ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 
-val for_all: ('a -> bool) -> 'a t -> bool
-    (** [for_all p s] checks if all elements of the set
+(** [for_all p s] checks if all elements of the set
 	satisfy the predicate [p]. *)
+val for_all : ('a -> bool) -> 'a t -> bool
 
-val exists: ('a -> bool) -> 'a t -> bool
-    (** [exists p s] checks if at least one element of
+(** [exists p s] checks if at least one element of
 	the set satisfies the predicate [p]. *)
+val exists : ('a -> bool) -> 'a t -> bool
 
-val filter: ('a -> bool) -> 'a t -> 'a t
-    (** [filter p s] returns the set of all elements in [s]
+(** [filter p s] returns the set of all elements in [s]
 	that satisfy predicate [p]. *)
+val filter : ('a -> bool) -> 'a t -> 'a t
 
-val partition: ('a -> bool) -> 'a t -> 'a t * 'a t
-    (** [partition p s] returns a pair of sets [(s1, s2)], where [s1] is the
+(** [partition p s] returns a pair of sets [(s1, s2)], where [s1] is the
 	set of all the elements of [s] that satisfy the predicate [p], and [s2]
 	is the set of all the elements of [s] that do not satisfy [p]. *)
+val partition : ('a -> bool) -> 'a t -> 'a t * 'a t
 
-val cardinal: 'a t -> int
-    (** Return the number of elements of a set. *)
+(** Return the number of elements of a set. *)
+val cardinal : 'a t -> int
 
-val elements: 'a t -> 'a list
-    (** Return the list of all elements of the given set.  The returned list
+(** Return the list of all elements of the given set.  The returned list
 	is sorted in increasing order with respect to the ordering
 	[Stdlib.compare]. *)
+val elements : 'a t -> 'a list
 
-val min_elt: 'a t -> 'a
-    (** Return the smallest element of the given set (with respect to the
+(** Return the smallest element of the given set (with respect to the
 	[Ord.compare] ordering), or raise [Not_found] if the set is empty. *)
+val min_elt : 'a t -> 'a
 
-val max_elt: 'a t -> 'a
-    (** Same as [min_elt], but returns the largest element of the given
+(** Same as [min_elt], but returns the largest element of the given
 	set. *)
+val max_elt : 'a t -> 'a
 
-val choose: 'a t -> 'a
-    (** Return one element of the given set, or raise [Not_found] if the set
+(** Return one element of the given set, or raise [Not_found] if the set
 	is empty. Which element is chosen is unspecified, but equal elements
 	will be chosen for equal sets. *)
+val choose : 'a t -> 'a
 
-val print :
-  ?first:(unit, Format.formatter, unit) format ->
-  ?sep:(unit, Format.formatter, unit) format ->
-  ?last:(unit, Format.formatter, unit) format ->
-  (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-    (** *)
+(** *)
+val print
+  :  ?first:(unit, Format.formatter, unit) format
+  -> ?sep:(unit, Format.formatter, unit) format
+  -> ?last:(unit, Format.formatter, unit) format
+  -> (Format.formatter -> 'a -> unit)
+  -> Format.formatter
+  -> 'a t
+  -> unit
 
+(** Internal, do not use *)
 val make : ('a -> 'a -> int) -> 'a Sette.t -> 'a t
-    (** Internal, do not use *)

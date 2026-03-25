@@ -7,12 +7,13 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
-let logger = {Log.fmt=Format.std_formatter; 
-              Log.module_name="VerifUtil";
-              Log.level=Log.Debug}
+let logger =
+  { Log.fmt = Format.std_formatter; Log.module_name = "VerifUtil"; Log.level = Log.Debug }
+;;
 
-type trans_t = Env.t -> Program.cfprog_t -> Analysis.result_to_bddapron_t -> 
-  Program.cfprog_t
+type trans_t =
+  Env.t -> Program.cfprog_t -> Analysis.result_to_bddapron_t -> Program.cfprog_t
+
 type analysis_t = Analysis.analyze_t
 
 type stratitem_t =
@@ -26,26 +27,27 @@ type strategy_t = stratitem_t list
 (******************************************************************************)
 (******************************************************************************)
 (* refines a CFG according to the given analysis result *)
-let refine ?(refine_bool=true) env cfprog refine_loc =
+let refine ?(refine_bool = true) env cfprog refine_loc =
   let cfg = cfprog.Program.c_cfg in
   (* replace invariants *)
-  PSHGraph.iter_vertex cfg
-    (fun v inv ~pred:_ ~succ:_ ->
-      match refine_loc ~refine_bool v inv with
-	|None -> PSHGraph.remove_vertex cfg v
-	|Some refinv -> PSHGraph.replace_attrvertex cfg v refinv
-    );
+  PSHGraph.iter_vertex cfg (fun v inv ~pred:_ ~succ:_ ->
+    match refine_loc ~refine_bool v inv with
+    | None -> PSHGraph.remove_vertex cfg v
+    | Some refinv -> PSHGraph.replace_attrvertex cfg v refinv);
   (* check feasibility of arcs*)
   let _ = Cfg.remove_infeasible_arcs env cfg cfprog.Program.c_ass in
   (* remove unconnected locations *)
-  let (unreach,_) = PSHGraph.reachable_multi 
-    Cfg.locid_dummy Cfg.arcid_dummy cfg 
-    (Cfg.get_locidset_by_inv env cfg cfprog.Program.c_init) in
-  PSHGraph.iter_vertex cfg
-    (fun v inv ~pred ~succ ->
-      if PSette.mem v unreach then PSHGraph.remove_vertex cfg v);
+  let unreach, _ =
+    PSHGraph.reachable_multi
+      Cfg.locid_dummy
+      Cfg.arcid_dummy
+      cfg
+      (Cfg.get_locidset_by_inv env cfg cfprog.Program.c_init)
+  in
+  PSHGraph.iter_vertex cfg (fun v inv ~pred ~succ ->
+    if PSette.mem v unreach then PSHGraph.remove_vertex cfg v);
   cfprog
-
+;;
 
 (*
 (******************************************************************************)
@@ -71,36 +73,59 @@ let print_overall_reach env cfprog bddapron_to_res =
   let doman = Bddapron.Domain0.make_bdd apronman in
   let cfg = cfprog.Program.c_cfg in
   let initial = cfprog.Program.c_init in
-  let initstates = Cfg.get_locidset_by_inv env cfg initial in 
-  Log.info_o logger (Format.pp_print_int) 
+  let initstates = Cfg.get_locidset_by_inv env cfg initial in
+  Log.info_o
+    logger
+    Format.pp_print_int
     "reachable boolean state space size: "
-    ((BddapronUtil.bool_space_size env.Env.env env.Env.cond env.Env.bs_vars
-      (Cudd.Bdd.exist env.Env.cond.Bdd.Cond.supp 
-       (Bddapron.Expr0.Bool.dand env.Env.env env.Env.cond
-        (Bddapron.Expr0.Bool.dnot env.Env.env env.Env.cond 
-          (Bddapron.Expr0.Bool.dor env.Env.env env.Env.cond
-             initial cfprog.Program.c_final))
-        (Mappe.fold
-          (fun _ s result -> 
-             List.fold_left (fun res (b,_) -> 
-                 Bddapron.Expr0.Bool.dor env.Env.env env.Env.cond b res)
-               result s)
-          anres
-          (Bddapron.Expr0.Bool.dfalse env.Env.env env.Env.cond)))))
-      +2);
-  Log.info_o logger (Bddapron.Domain0.print doman env.Env.env) 
+    (BddapronUtil.bool_space_size
+       env.Env.env
+       env.Env.cond
+       env.Env.bs_vars
+       (Cudd.Bdd.exist
+          env.Env.cond.Bdd.Cond.supp
+          (Bddapron.Expr0.Bool.dand
+             env.Env.env
+             env.Env.cond
+             (Bddapron.Expr0.Bool.dnot
+                env.Env.env
+                env.Env.cond
+                (Bddapron.Expr0.Bool.dor
+                   env.Env.env
+                   env.Env.cond
+                   initial
+                   cfprog.Program.c_final))
+             (Mappe.fold
+                (fun _ s result ->
+                   List.fold_left
+                     (fun res (b, _) ->
+                        Bddapron.Expr0.Bool.dor env.Env.env env.Env.cond b res)
+                     result
+                     s)
+                anres
+                (Bddapron.Expr0.Bool.dfalse env.Env.env env.Env.cond))))
+     + 2);
+  Log.info_o
+    logger
+    (Bddapron.Domain0.print doman env.Env.env)
     "overall invariant: "
     (Mappe.fold
-      (fun _ s result -> 
-         Bddapron.Domain0.join doman result 
-           (Bddapron.Domain0.of_bddapron doman env.Env.env 
-              (List.map (fun (b,n) -> (b,
-                Apron.Abstract1.abstract0
-                  (Apron.Abstract1.of_lincons_array apronman
-                      env.Env.apronenv n)))
-                s)))
-      (Mappe.filter (fun  v _ -> not (PSette.mem v initstates)) anres)
-      (Bddapron.Domain0.bottom doman env.Env.env))
+       (fun _ s result ->
+          Bddapron.Domain0.join
+            doman
+            result
+            (Bddapron.Domain0.of_bddapron
+               doman
+               env.Env.env
+               (List.map
+                  (fun (b, n) ->
+                     ( b
+                     , Apron.Abstract1.abstract0
+                         (Apron.Abstract1.of_lincons_array apronman env.Env.apronenv n) ))
+                  s)))
+       (Mappe.filter (fun v _ -> not (PSette.mem v initstates)) anres)
+       (Bddapron.Domain0.bottom doman env.Env.env))
+;;
 
 (*
 (******************************************************************************)

@@ -4,8 +4,8 @@
 (** framework base: utilities and types for the verification loop *)
 
 (** CFG Transformation Interface *)
-type trans_t = Env.t -> Program.cfprog_t -> Analysis.result_to_bddapron_t -> 
-  Program.cfprog_t
+type trans_t =
+  Env.t -> Program.cfprog_t -> Analysis.result_to_bddapron_t -> Program.cfprog_t
 
 (** Analysis Interface *)
 type analysis_t = Analysis.analyze_t
@@ -19,7 +19,15 @@ type stratitem_t =
 type strategy_t = stratitem_t list
 
 (** refinement of CFG location definitions by the analysis result *)
-val refine : ?refine_bool:bool -> Env.t -> Program.cfprog_t -> 
-  Analysis.refine_loc_t -> Program.cfprog_t
+val refine
+  :  ?refine_bool:bool
+  -> Env.t
+  -> Program.cfprog_t
+  -> Analysis.refine_loc_t
+  -> Program.cfprog_t
 
-val print_overall_reach : Env.t -> Program.cfprog_t -> Analysis.result_to_bddapron_t -> unit
+val print_overall_reach
+  :  Env.t
+  -> Program.cfprog_t
+  -> Analysis.result_to_bddapron_t
+  -> unit

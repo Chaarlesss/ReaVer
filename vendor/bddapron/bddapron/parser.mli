@@ -8,17 +8,26 @@
 (** {3 From strings} *)
 
 val expr0_of_string : 'a Env.t -> 'a Cond.t -> string -> 'a Expr0.t
-
 val expr1_of_string : 'a Env.t -> 'a Cond.t -> string -> 'a Expr1.t
-val listexpr1_of_lstring :
-  'a Env.t -> 'a Cond.t -> string list -> 'a Expr1.List.t
+val listexpr1_of_lstring : 'a Env.t -> 'a Cond.t -> string list -> 'a Expr1.List.t
 
-val listexpr2_of_lstring :
-  ?normalize:bool -> ?reduce:bool -> ?careset:bool ->
-  'a Env.t -> 'a Cond.t -> string list -> 'a Expr2.List.t
-val boolexpr2_of_string :
-  ?normalize:bool -> ?reduce:bool -> ?careset:bool ->
-  'a Env.t -> 'a Cond.t -> string -> 'a Expr2.Bool.t
+val listexpr2_of_lstring
+  :  ?normalize:bool
+  -> ?reduce:bool
+  -> ?careset:bool
+  -> 'a Env.t
+  -> 'a Cond.t
+  -> string list
+  -> 'a Expr2.List.t
+
+val boolexpr2_of_string
+  :  ?normalize:bool
+  -> ?reduce:bool
+  -> ?careset:bool
+  -> 'a Env.t
+  -> 'a Cond.t
+  -> string
+  -> 'a Expr2.Bool.t
 
 (** {3 Misc.} *)
 

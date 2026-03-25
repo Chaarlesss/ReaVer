@@ -7,32 +7,30 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
-let logger = {Log.fmt=Format.std_formatter; 
-              Log.module_name="Analysis";
-              Log.level=Log.Debug}
+let logger =
+  { Log.fmt = Format.std_formatter; Log.module_name = "Analysis"; Log.level = Log.Debug }
+;;
 
 (******************************************************************************)
 (** {2 Analysis Module Type } *)
 (******************************************************************************)
 
 type direction_t = ApronAccel.direction_t
-
 type bddapron_res_t = (Cfg.locid_t, (Env.boolexpr_t * ApronUtil.linconss_t) list) Mappe.t
 type refine_loc_t = refine_bool:bool -> Cfg.locid_t -> Loc.t -> Loc.t option
-type print_result_t =  Format.formatter -> unit -> unit
+type print_result_t = Format.formatter -> unit -> unit
 type result_to_bddapron_t = unit -> bddapron_res_t
 
-type analyze_t = Env.t -> Program.cfprog_t -> 
-  (bool * refine_loc_t * print_result_t * result_to_bddapron_t)
+type analyze_t =
+  Env.t -> Program.cfprog_t -> bool * refine_loc_t * print_result_t * result_to_bddapron_t
 
 let bddapron_res_empty = Mappe.empty
 
-module type T = 
-  sig
-    type analysisparam_t
+module type T = sig
+  type analysisparam_t
 
-    val analyze : analysisparam_t -> analyze_t
-  end
+  val analyze : analysisparam_t -> analyze_t
+end
 
 (*
 (* add cfg refinement for new domains here *)
@@ -76,4 +74,3 @@ let print_domain env fmt s =
     |StrictPolPow s -> DomainStd.StrictPolPow.print env fmt s
     |StrictPolProd s -> DomainStd.StrictPolProd.print env fmt s
 *)
-

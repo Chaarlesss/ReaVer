@@ -27,7 +27,6 @@ module StrictPolPow : Domain.NOPARAM_T
     with strict inequalities *)
 module StrictPolProd : Domain.NOPARAM_T
 
-
 (** {2 Logico-numerical domains with octagons } *)
 
 (** domain manager for octagons *)
@@ -38,7 +37,6 @@ module OctPow : Domain.NOPARAM_T
 
 (** logico-numerical product domain with octagons *)
 module OctProd : Domain.NOPARAM_T
-
 
 (** {2 Logico-numerical domains with intervals (boxes) } *)
 

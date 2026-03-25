@@ -1,9 +1,10 @@
 (library
-  (name latticeAutomata)
-  (public_name latticeAutomata)
-  (wrapped false)
-  (libraries camllib stdlib-shims))
+ (name latticeAutomata)
+ (public_name latticeAutomata)
+ (wrapped false)
+ (libraries camllib stdlib-shims))
 
 (env
-  (dev
-    (flags (:standard -warn-error -A))))
+ (dev
+  (flags
+   (:standard -warn-error -A))))

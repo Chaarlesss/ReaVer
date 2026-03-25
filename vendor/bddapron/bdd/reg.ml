@@ -16,8 +16,8 @@ This module requires the mlcuddidl library.
 
 *)
 
+(** type of arrays of bits *)
 type 'a t = 'a Cudd.Bdd.t array
-  (** type of arrays of bits *)
 
 type dt = Cudd.Man.d t
 type vt = Cudd.Man.v t
@@ -26,84 +26,77 @@ type vt = Cudd.Man.v t
 (** {3 Logical operations} *)
 (*  *********************************************************************** *)
 
-let lnot x =
-  Array.map (fun bdd -> Cudd.Bdd.dnot bdd) x
+let lnot x = Array.map (fun bdd -> Cudd.Bdd.dnot bdd) x
 
 let shift_left man n x =
   let size = Array.length x in
-  if size=0 then
-    (x,Cudd.Bdd.dfalse man)
-  else if n=0 then
-    (Array.copy x, Cudd.Bdd.dfalse man)
-  else if n>=1 then begin
+  if size = 0
+  then x, Cudd.Bdd.dfalse man
+  else if n = 0
+  then Array.copy x, Cudd.Bdd.dfalse man
+  else if n >= 1
+  then (
     let nx = Array.make size (Cudd.Bdd.dfalse man) in
-    if n>=1 && n<=size then begin
-      Array.blit x 0 nx n (size-n) ;
-      (nx, x.(size-n))
-    end
-    else
-      (nx, Cudd.Bdd.dfalse man)
-  end
-  else
-    failwith ("Bdd.Reg.shift_left: negative range for the shift "^(string_of_int n))
-
+    if n >= 1 && n <= size
+    then (
+      Array.blit x 0 nx n (size - n);
+      nx, x.(size - n))
+    else nx, Cudd.Bdd.dfalse man)
+  else failwith ("Bdd.Reg.shift_left: negative range for the shift " ^ string_of_int n)
+;;
 
 let shift_right man n x =
   let size = Array.length x in
-  if size=0 then
-    (x,Cudd.Bdd.dfalse man)
-  else if n=0 then
-    (Array.copy x, Cudd.Bdd.dfalse man)
-  else if n>=1 then begin
-    let nx = Array.make size x.(size-1) in
-    if n<=size then begin
-      Array.blit x n nx 0 (size-n);
-      (nx, x.(n-1))
-    end
-    else
-      (nx, x.(size-1))
-  end
-  else
-    failwith ("Bdd.Reg.shift_right: negative range for the shift "^(string_of_int n))
+  if size = 0
+  then x, Cudd.Bdd.dfalse man
+  else if n = 0
+  then Array.copy x, Cudd.Bdd.dfalse man
+  else if n >= 1
+  then (
+    let nx = Array.make size x.(size - 1) in
+    if n <= size
+    then (
+      Array.blit x n nx 0 (size - n);
+      nx, x.(n - 1))
+    else nx, x.(size - 1))
+  else failwith ("Bdd.Reg.shift_right: negative range for the shift " ^ string_of_int n)
+;;
 
 let shift_right_logical man n x =
   let size = Array.length x in
-  if size=0 then
-    (x,Cudd.Bdd.dfalse man)
-  else if n=0 then
-    (Array.copy x, Cudd.Bdd.dfalse man)
-  else if n>=1 then begin
+  if size = 0
+  then x, Cudd.Bdd.dfalse man
+  else if n = 0
+  then Array.copy x, Cudd.Bdd.dfalse man
+  else if n >= 1
+  then (
     let nx = Array.make size (Cudd.Bdd.dfalse man) in
-    if n<=size then begin
-      Array.blit x n nx 0 (size-n);
-      (nx, x.(n-1))
-    end
-    else
-      (nx, Cudd.Bdd.dfalse man)
-  end
+    if n <= size
+    then (
+      Array.blit x n nx 0 (size - n);
+      nx, x.(n - 1))
+    else nx, Cudd.Bdd.dfalse man)
   else
-    failwith ("Bdd.Reg.shift_right_logical: negative range for the shift "^(string_of_int n))
+    failwith
+      ("Bdd.Reg.shift_right_logical: negative range for the shift " ^ string_of_int n)
+;;
 
 (** This function extends the size of a signed or unsigned integer. *)
 
-let extend man ~(signed:bool) (n:int) (x:'a t) =
+let extend man ~(signed : bool) (n : int) (x : 'a t) =
   let size = Array.length x in
-  if n > 0 then
-    let bit =
-      if signed && size>0 then
-	x.(size-1)
-      else
-	(Cudd.Bdd.dfalse man)
-    in
+  if n > 0
+  then (
+    let bit = if signed && size > 0 then x.(size - 1) else Cudd.Bdd.dfalse man in
     let nx = Array.make (size + n) bit in
     for i = 0 to size - 1 do
       nx.(i) <- x.(i)
     done;
-    nx
-  else if n < 0 then
-    Array.init (size + n) (fun i -> x.(i))
-  else
-    Array.copy x
+    nx)
+  else if n < 0
+  then Array.init (size + n) (fun i -> x.(i))
+  else Array.copy x
+;;
 
 (*  *********************************************************************** *)
 (** {3 Arithmetic operations} *)
@@ -113,255 +106,283 @@ let extend man ~(signed:bool) (n:int) (x:'a t) =
 arrays, and the carry. *)
 
 let succ man x =
-  let size = (Array.length x) in
-  if size=0 then
-    (x, Cudd.Bdd.dtrue man)
-  else begin
-    let carry = Array.make (size+1) (Cudd.Bdd.dtrue man) in
-    for i=1 to size do
-      carry.(i) <- Cudd.Bdd.dand carry.(i-1) x.(i-1)
+  let size = Array.length x in
+  if size = 0
+  then x, Cudd.Bdd.dtrue man
+  else (
+    let carry = Array.make (size + 1) (Cudd.Bdd.dtrue man) in
+    for i = 1 to size do
+      carry.(i) <- Cudd.Bdd.dand carry.(i - 1) x.(i - 1)
     done;
-    (Array.init size (fun i -> Cudd.Bdd.xor x.(i) carry.(i)),
-    carry.(size))
-  end
+    Array.init size (fun i -> Cudd.Bdd.xor x.(i) carry.(i)), carry.(size))
+;;
 
 let pred man x =
-  let size = (Array.length x) in
-  if size=0 then
-    (x, Cudd.Bdd.dtrue man)
-  else begin
-    let carry = Array.make (size+1) (Cudd.Bdd.dtrue man) in
-    for i=1 to size do
-      carry.(i) <- Cudd.Bdd.dand carry.(i-1) (Cudd.Bdd.dnot x.(i-1))
+  let size = Array.length x in
+  if size = 0
+  then x, Cudd.Bdd.dtrue man
+  else (
+    let carry = Array.make (size + 1) (Cudd.Bdd.dtrue man) in
+    for i = 1 to size do
+      carry.(i) <- Cudd.Bdd.dand carry.(i - 1) (Cudd.Bdd.dnot x.(i - 1))
     done;
-    (Array.init size (fun i -> Cudd.Bdd.xor x.(i) carry.(i)),
-    carry.(size))
-  end
+    Array.init size (fun i -> Cudd.Bdd.xor x.(i) carry.(i)), carry.(size))
+;;
 
 (** These are the arithmetic operations. We assume operands have same
   size. The result, carry and overflow are returned. *)
 
 let add man x y =
-  let size = (Array.length x) in
-  if size=0 then
+  let size = Array.length x in
+  if size = 0
+  then (
     let dfalse = Cudd.Bdd.dfalse man in
-    (x, dfalse, dfalse)
-  else begin
+    x, dfalse, dfalse)
+  else (
     (* carry *)
-    let carry = Array.make (size+1) (Cudd.Bdd.dfalse man) in
+    let carry = Array.make (size + 1) (Cudd.Bdd.dfalse man) in
     (* computation *)
-    for i=1 to size do
-      carry.(i) <- (Cudd.Bdd.ite carry.(i-1)
-	(Cudd.Bdd.dor x.(i-1) y.(i-1))
-	(Cudd.Bdd.dand x.(i-1) y.(i-1)))
+    for i = 1 to size do
+      carry.(i)
+      <- Cudd.Bdd.ite
+           carry.(i - 1)
+           (Cudd.Bdd.dor x.(i - 1) y.(i - 1))
+           (Cudd.Bdd.dand x.(i - 1) y.(i - 1))
     done;
-    let z = Array.init size (fun i -> Cudd.Bdd.xor carry.(i) (Cudd.Bdd.xor x.(i) y.(i))) in
-    (z,
-    carry.(size),
-    Cudd.Bdd.dand (Cudd.Bdd.eq x.(size-1) y.(size-1)) (Cudd.Bdd.xor x.(size-1) z.(size-1)))
-  end
+    let z =
+      Array.init size (fun i -> Cudd.Bdd.xor carry.(i) (Cudd.Bdd.xor x.(i) y.(i)))
+    in
+    ( z
+    , carry.(size)
+    , Cudd.Bdd.dand
+        (Cudd.Bdd.eq x.(size - 1) y.(size - 1))
+        (Cudd.Bdd.xor x.(size - 1) z.(size - 1)) ))
+;;
 
 let sub man x y =
-  let size = (Array.length x) in
-  if size=0 then
+  let size = Array.length x in
+  if size = 0
+  then (
     let dfalse = Cudd.Bdd.dfalse man in
-    (x, dfalse, dfalse)
-  else begin
+    x, dfalse, dfalse)
+  else (
     (* carry *)
-    let carry = Array.make (size+1) (Cudd.Bdd.dfalse man) in
+    let carry = Array.make (size + 1) (Cudd.Bdd.dfalse man) in
     (* computation *)
-    for i=1 to size do
-      carry.(i) <- (Cudd.Bdd.ite carry.(i-1)
-	(Cudd.Bdd.dor (Cudd.Bdd.dnot x.(i-1)) y.(i-1))
-	(Cudd.Bdd.dand (Cudd.Bdd.dnot x.(i-1)) y.(i-1)))
+    for i = 1 to size do
+      carry.(i)
+      <- Cudd.Bdd.ite
+           carry.(i - 1)
+           (Cudd.Bdd.dor (Cudd.Bdd.dnot x.(i - 1)) y.(i - 1))
+           (Cudd.Bdd.dand (Cudd.Bdd.dnot x.(i - 1)) y.(i - 1))
     done;
-    let z = Array.init size (fun i -> Cudd.Bdd.xor carry.(i) (Cudd.Bdd.xor x.(i) y.(i))) in
-    (z,
-    carry.(size),
-    Cudd.Bdd.dand (Cudd.Bdd.xor x.(size-1) y.(size-1)) (Cudd.Bdd.xor x.(size-1) z.(size-1)))
-  end
+    let z =
+      Array.init size (fun i -> Cudd.Bdd.xor carry.(i) (Cudd.Bdd.xor x.(i) y.(i)))
+    in
+    ( z
+    , carry.(size)
+    , Cudd.Bdd.dand
+        (Cudd.Bdd.xor x.(size - 1) y.(size - 1))
+        (Cudd.Bdd.xor x.(size - 1) z.(size - 1)) ))
+;;
 
-let neg x =
-  if x=[||] then x else fst (succ (Cudd.Bdd.manager x.(0)) (lnot x))
+let neg x = if x = [||] then x else fst (succ (Cudd.Bdd.manager x.(0)) (lnot x))
 
 let scale cst x =
-  if x=[||] then
-    x
-  else begin
+  if x = [||]
+  then x
+  else (
     let man = Cudd.Bdd.manager x.(0) in
-    let size = Array.length x and
-      dfalse = Cudd.Bdd.dfalse man
-    in
+    let size = Array.length x
+    and dfalse = Cudd.Bdd.dfalse man in
     let cst = ref cst in
-    let z = ref(Array.make size dfalse) and l = ref 0 in
+    let z = ref (Array.make size dfalse)
+    and l = ref 0 in
     while !cst <> 0 do
-      if !cst land 1 = 1 then begin
-	let (r,_,_) = add man !z (if !l=0 then x else (fst (shift_left man !l x))) in
-	z := r
-      end;
-      cst := !cst lsr 1; incr l;
+      if !cst land 1 = 1
+      then (
+        let r, _, _ = add man !z (if !l = 0 then x else fst (shift_left man !l x)) in
+        z := r);
+      cst := !cst lsr 1;
+      incr l
     done;
-    !z
-  end
+    !z)
+;;
 
 let ite bdd x y =
   let res = Array.copy x in
-  for i=0 to (Array.length x) - 1 do
+  for i = 0 to Array.length x - 1 do
     res.(i) <- Cudd.Bdd.ite bdd x.(i) y.(i)
   done;
   res
+;;
 
 let mul x y =
-  if x=[||] then
-    x
-  else begin
+  if x = [||]
+  then x
+  else (
     let man = Cudd.Bdd.manager x.(0) in
-    let size = Array.length x and
-      dfalse = Cudd.Bdd.dfalse man
-    in
-    let z = ref(Array.make size dfalse) in
-    for i=0 to size-1 do
-      let (r,_,_) =
-	add man !z (if i=0 then y else (fst (shift_left man i y)))
-      in
+    let size = Array.length x
+    and dfalse = Cudd.Bdd.dfalse man in
+    let z = ref (Array.make size dfalse) in
+    for i = 0 to size - 1 do
+      let r, _, _ = add man !z (if i = 0 then y else fst (shift_left man i y)) in
       z := ite x.(i) r !z
     done;
-    !z
-  end
+    !z)
+;;
 
 (** {3 Predicates} *)
 
-let is_cst (x:'a t) : bool =
+let is_cst (x : 'a t) : bool =
   try
-    Array.iter
-      (begin fun bdd -> if not (Cudd.Bdd.is_cst bdd) then raise Exit end)
-      x
-    ;
+    Array.iter (fun bdd -> if not (Cudd.Bdd.is_cst bdd) then raise Exit) x;
     true
-  with Exit ->
-    false
+  with
+  | Exit -> false
+;;
 
 let zero man x =
   let res = ref (Cudd.Bdd.dtrue man) in
-  for i=0 to (Array.length x) - 1 do
+  for i = 0 to Array.length x - 1 do
     res := Cudd.Bdd.dand !res (Cudd.Bdd.dnot x.(i))
   done;
   !res
+;;
 
 let equal man x y =
   let res = ref (Cudd.Bdd.dtrue man) in
-  for i=0 to (Array.length x) - 1 do
-    res := Cudd.Bdd.dand !res (Cudd.Bdd.eq x.(i) y.(i));
+  for i = 0 to Array.length x - 1 do
+    res := Cudd.Bdd.dand !res (Cudd.Bdd.eq x.(i) y.(i))
   done;
   !res
+;;
 
 let greatereq man x y =
-  if x=[||] then
-    Cudd.Bdd.dtrue man
-  else
-    let (z,c,v) = sub man x y in
-    (Cudd.Bdd.eq v z.((Array.length z) - 1))
+  if x = [||]
+  then Cudd.Bdd.dtrue man
+  else (
+    let z, c, v = sub man x y in
+    Cudd.Bdd.eq v z.(Array.length z - 1))
+;;
 
 let greater man x y =
-  if x=[||] then
-    Cudd.Bdd.dfalse man
-  else
-    let (z,c,v) = sub man x y in
-    Cudd.Bdd.dand (Cudd.Bdd.eq v z.((Array.length z) - 1)) (Cudd.Bdd.dnot (zero man z))
+  if x = [||]
+  then Cudd.Bdd.dfalse man
+  else (
+    let z, c, v = sub man x y in
+    Cudd.Bdd.dand (Cudd.Bdd.eq v z.(Array.length z - 1)) (Cudd.Bdd.dnot (zero man z)))
+;;
 
 let highereq man x y =
-  if x=[||] then
-    Cudd.Bdd.dtrue man
-  else
-    let (z,c,v) = sub man x y in
-    Cudd.Bdd.dnot c
+  if x = [||]
+  then Cudd.Bdd.dtrue man
+  else (
+    let z, c, v = sub man x y in
+    Cudd.Bdd.dnot c)
+;;
 
 let higher man x y =
-  if x=[||] then
-    Cudd.Bdd.dfalse man
-  else
-    let (z,c,v) = sub man x y in
-    Cudd.Bdd.dand (Cudd.Bdd.dnot c) (Cudd.Bdd.dnot (zero man z))
+  if x = [||]
+  then Cudd.Bdd.dfalse man
+  else (
+    let z, c, v = sub man x y in
+    Cudd.Bdd.dand (Cudd.Bdd.dnot c) (Cudd.Bdd.dnot (zero man z)))
+;;
 
 (*  *********************************************************************** *)
 (** {3 Constants} *)
 (*  *********************************************************************** *)
 
 let min_size n =
-  if n=0 then
-    0
-  else begin
-    let sign = (n<0) in
-    let size = ref 0 and reg = ref 1 in
-    if not sign then
-      while n >= !reg do reg := !reg lsl 1; incr size done
-    else begin
+  if n = 0
+  then 0
+  else (
+    let sign = n < 0 in
+    let size = ref 0
+    and reg = ref 1 in
+    if not sign
+    then
+      while n >= !reg do
+        reg := !reg lsl 1;
+        incr size
+      done
+    else (
       incr size;
-      while -n > !reg do reg := !reg lsl 1; incr size done
-    end;
-    !size
-  end
+      while -n > !reg do
+        reg := !reg lsl 1;
+        incr size
+      done);
+    !size)
+;;
 
 let of_int man size n =
-  if size=0 && n=0 then
-    [||]
-  else begin
+  if size = 0 && n = 0
+  then [||]
+  else (
     (* range checking *)
-    if size < min_size n then
+    if size < min_size n
+    then
       failwith (Format.sprintf "Bddreg.of_int size=%d n=%d: size is too small !" size n);
-    let bddtrue = Cudd.Bdd.dtrue man and bddfalse = Cudd.Bdd.dfalse man in
+    let bddtrue = Cudd.Bdd.dtrue man
+    and bddfalse = Cudd.Bdd.dfalse man in
     (* read the bits of n *)
     let bit = ref 1 in
-    let x = Array.init size
-      (begin fun i ->
-	let res =
-	  if (n land !bit) = !bit then bddtrue else bddfalse
-	in
-	bit := !bit lsl 1;
-	res
-      end)
+    let x =
+      Array.init size (fun i ->
+        let res = if n land !bit = !bit then bddtrue else bddfalse in
+        bit := !bit lsl 1;
+        res)
     in
-    x
-  end
+    x)
+;;
 
-let to_int ~(signed:bool) (x:'a t) =
-  if x=[||] then
-    0
-  else begin
+let to_int ~(signed : bool) (x : 'a t) =
+  if x = [||]
+  then 0
+  else (
     let acc =
       Array.fold_right
-	(begin fun bdd acc ->
-	  if Cudd.Bdd.is_true bdd then
-	    2 * acc + 1
-	  else if Cudd.Bdd.is_false bdd then
-	    2 * acc
-	  else
-	    raise (Invalid_argument ("Bddreg.to_int: argument does not correspond to a constant value"))
-	end)
-	x
-	0
+        (fun bdd acc ->
+           if Cudd.Bdd.is_true bdd
+           then (2 * acc) + 1
+           else if Cudd.Bdd.is_false bdd
+           then 2 * acc
+           else
+             raise
+               (Invalid_argument
+                  "Bddreg.to_int: argument does not correspond to a constant value"))
+        x
+        0
     in
-    let seuil = 1 lsl ((Array.length x)-1) in
-    if signed && acc >= seuil
-    then acc - (seuil lsl 1)
-    else acc
-  end
+    let seuil = 1 lsl (Array.length x - 1) in
+    if signed && acc >= seuil then acc - (seuil lsl 1) else acc)
+;;
 
 let equal_int man x n =
   let y = of_int man (Array.length x) n in
   equal man x y
+;;
+
 let greatereq_int man x n =
   let y = of_int man (Array.length x) n in
   greatereq man x y
+;;
+
 let greater_int man x n =
   let y = of_int man (Array.length x) n in
   greater man x y
+;;
+
 let highereq_int man x n =
   let y = of_int man (Array.length x) n in
   highereq man x y
+;;
+
 let higher_int man x n =
   let y = of_int man (Array.length x) n in
   higher man x y
+;;
 
 (*  *********************************************************************** *)
 (** {3 Decomposition in guarded form} *)
@@ -375,140 +396,135 @@ module Minterm = struct
   type t = Cudd.Man.tbool array
 
   (** Tests if the minterm is completely non determinated *)
-  let is_indet (minterm:t) : bool
-    =
-    Array.fold_left
-      (fun res elt -> res && (elt=Cudd.Man.Top))
-      true minterm
+  let is_indet (minterm : t) : bool =
+    Array.fold_left (fun res elt -> res && elt = Cudd.Man.Top) true minterm
+  ;;
 
   (** Converts an possibly negative integer into a minterm of size [size] *)
-  let of_int (size:int) (n:int) : t
-    =
-    if size=0 && n=0 then
-      [||]
-    else begin
+  let of_int (size : int) (n : int) : t =
+    if size = 0 && n = 0
+    then [||]
+    else (
       (* range checking *)
-      if size < min_size n then
-	failwith (Format.sprintf "Bddreg.Minterm.of_int size=%d n=%d: size is too small !" size n);
+      if size < min_size n
+      then
+        failwith
+          (Format.sprintf
+             "Bddreg.Minterm.of_int size=%d n=%d: size is too small !"
+             size
+             n);
       (* read the bits of n *)
       let bit = ref 1 in
-      let x = Array.init size
-	(begin fun i ->
-	  let res =
-	    if (n land !bit) = !bit then Cudd.Man.True else Cudd.Man.False
-	  in
-	  bit := !bit lsl 1;
-	  res
-	end)
+      let x =
+        Array.init size (fun i ->
+          let res = if n land !bit = !bit then Cudd.Man.True else Cudd.Man.False in
+          bit := !bit lsl 1;
+          res)
       in
-      x
-    end
+      x)
+  ;;
 
   (** Converts the *determinated* minterm [minterm] to an integer, with the
     Least Significant Bit in the first position. *)
-  let to_int ~(signed:bool) (minterm:t) : int
-    =
-    if minterm=[||] then
-      0
-    else begin
+  let to_int ~(signed : bool) (minterm : t) : int =
+    if minterm = [||]
+    then 0
+    else (
       let acc =
-	Array.fold_right
-	  (begin fun (tbool:Cudd.Man.tbool) acc ->
-	    begin match tbool with
-	    | Cudd.Man.True -> 2 * acc + 1;
-	    | Cudd.Man.Top ->
-		raise (Invalid_argument ("Bddreg.Minterm.to_int: argument does not correspond to a constant value"))
-	    | Cudd.Man.False -> 2 * acc
-	    end;
-	  end)
-	  minterm
-	  0
+        Array.fold_right
+          (fun (tbool : Cudd.Man.tbool) acc ->
+             match tbool with
+             | Cudd.Man.True -> (2 * acc) + 1
+             | Cudd.Man.Top ->
+               raise
+                 (Invalid_argument
+                    "Bddreg.Minterm.to_int: argument does not correspond to a constant \
+                     value")
+             | Cudd.Man.False -> 2 * acc)
+          minterm
+          0
       in
-      let seuil = 1 lsl ((Array.length minterm)-1) in
-      if signed && acc >= seuil
-      then acc - (seuil lsl 1)
-      else acc
-    end
+      let seuil = 1 lsl (Array.length minterm - 1) in
+      if signed && acc >= seuil then acc - (seuil lsl 1) else acc)
+  ;;
 
   (** Iters the function [f] on all the completely determinated minterms
     generated from the given non determinated minterm [minterm]. *)
-  let iter (f:t -> unit) (minterm:t) : unit
-    =
+  let iter (f : t -> unit) (minterm : t) : unit =
     let rec parcours minterm i =
-      if i = (Array.length minterm) then
-	f minterm
-      else
-	match minterm.(i) with
-	| Cudd.Man.False | Cudd.Man.True -> parcours minterm (i+1)
-	| Cudd.Man.Top ->
-	    let nminterm = Array.copy minterm in
-	    nminterm.(i) <- Cudd.Man.False;
-	    parcours nminterm (i+1);
-	    let nminterm = Array.copy minterm in
-	    nminterm.(i) <- Cudd.Man.True;
-	    parcours nminterm (i+1)
+      if i = Array.length minterm
+      then f minterm
+      else (
+        match minterm.(i) with
+        | Cudd.Man.False | Cudd.Man.True -> parcours minterm (i + 1)
+        | Cudd.Man.Top ->
+          let nminterm = Array.copy minterm in
+          nminterm.(i) <- Cudd.Man.False;
+          parcours nminterm (i + 1);
+          let nminterm = Array.copy minterm in
+          nminterm.(i) <- Cudd.Man.True;
+          parcours nminterm (i + 1))
     in
     parcours minterm 0
+  ;;
 
-  let map (f:t -> 'a) (minterm:t) : 'a list
-    =
+  let map (f : t -> 'a) (minterm : t) : 'a list =
     let res = ref [] in
-    let nf minterm = begin res := (f minterm) :: !res end in
+    let nf minterm = res := f minterm :: !res in
     iter nf minterm;
     List.rev !res
-
+  ;;
 end
 
-let guard_of_minterm man (x:'a t) (minterm:Minterm.t) : 'a Cudd.Bdd.t
-  =
+let guard_of_minterm man (x : 'a t) (minterm : Minterm.t) : 'a Cudd.Bdd.t =
   let guard = ref (Cudd.Bdd.dtrue man) in
-  begin try
-    Array.iteri
-      (begin fun i (tbool:Cudd.Man.tbool) ->
-	let nguard = match tbool with
-	  | Cudd.Man.True -> x.(i)
-	  | Cudd.Man.False -> Cudd.Bdd.dnot x.(i)
-	  | Cudd.Man.Top -> raise (Invalid_argument ("Bddreg.guard_of_minterm: argument does not correspond to a constant value"))
-	in
-	guard := Cudd.Bdd.dand !guard nguard;
-	if Cudd.Bdd.is_false !guard then raise Exit;
-      end)
-      minterm;
-    ()
-  with Exit ->
-    ()
-  end;
+  (try
+     Array.iteri
+       (fun i (tbool : Cudd.Man.tbool) ->
+          let nguard =
+            match tbool with
+            | Cudd.Man.True -> x.(i)
+            | Cudd.Man.False -> Cudd.Bdd.dnot x.(i)
+            | Cudd.Man.Top ->
+              raise
+                (Invalid_argument
+                   "Bddreg.guard_of_minterm: argument does not correspond to a constant \
+                    value")
+          in
+          guard := Cudd.Bdd.dand !guard nguard;
+          if Cudd.Bdd.is_false !guard then raise Exit)
+       minterm;
+     ()
+   with
+   | Exit -> ());
   !guard
+;;
 
-let guard_of_int man (x:'a t) (code:int) : 'a Cudd.Bdd.t
-  =
+let guard_of_int man (x : 'a t) (code : int) : 'a Cudd.Bdd.t =
   let minterm = Minterm.of_int (Array.length x) code in
   guard_of_minterm man x minterm
+;;
 
-let guardints man ~(signed:bool) (x:'a t) : ('a Cudd.Bdd.t * int) list
-  =
+let guardints man ~(signed : bool) (x : 'a t) : ('a Cudd.Bdd.t * int) list =
   let lguardint = ref [] in
   let minterm =
     Array.map
-      (begin fun bdd ->
-	begin match Cudd.Bdd.inspect bdd with
-	| Cudd.Bdd.Bool(b) -> if b then Cudd.Man.True else Cudd.Man.False
-	| _ -> Cudd.Man.Top
-	end
-      end)
+      (fun bdd ->
+         match Cudd.Bdd.inspect bdd with
+         | Cudd.Bdd.Bool b -> if b then Cudd.Man.True else Cudd.Man.False
+         | _ -> Cudd.Man.Top)
       x
   in
   Minterm.iter
-    (begin fun valminterm ->
-      let guard = guard_of_minterm man x valminterm in
-      if not (Cudd.Bdd.is_false guard) then begin
-	let code = Minterm.to_int ~signed valminterm in
-	lguardint := (guard,code) :: !lguardint
-      end
-    end)
-    minterm
-  ;
+    (fun valminterm ->
+       let guard = guard_of_minterm man x valminterm in
+       if not (Cudd.Bdd.is_false guard)
+       then (
+         let code = Minterm.to_int ~signed valminterm in
+         lguardint := (guard, code) :: !lguardint))
+    minterm;
   !lguardint
+;;
 
 (*  *********************************************************************** *)
 (** {3 Evaluation} *)
@@ -525,61 +541,58 @@ let tdrestrict x bdd = Array.map (fun x -> Cudd.Bdd.tdrestrict x bdd) x
 open Format
 
 let print f fmt x =
-  Print.array ~first:"[|@[<hov>" ~sep:";@ " ~last:"]@]|]"
-    (Cudd.Bdd.print f)
-    fmt x
+  Print.array ~first:"[|@[<hov>" ~sep:";@ " ~last:"]@]|]" (Cudd.Bdd.print f) fmt x
+;;
 
 let print_minterm
-  ~(signed:bool)
-  (print_bdd: Format.formatter -> 'a Cudd.Bdd.t -> unit)
-  fmt
-  (x:'a t)
+      ~(signed : bool)
+      (print_bdd : Format.formatter -> 'a Cudd.Bdd.t -> unit)
+      fmt
+      (x : 'a t)
   =
-  if x=[||] then
-    pp_print_char fmt '0'
-  else begin
-    if is_cst x then begin
-      let n = to_int ~signed:signed x in
-      fprintf fmt "{ %i }" n
-    end
-    else begin
-      let lguardints = guardints (Cudd.Bdd.manager x.(0)) ~signed x in
-      Print.list ~first:"{ @[<v>" ~sep:"@; " ~last:"@] }"
-	(fun fmt (guard,code) ->
-	  fprintf fmt "%i IF %a" code print_bdd guard)
-	fmt
-	lguardints
-    end
-  end
+  if x = [||]
+  then pp_print_char fmt '0'
+  else if is_cst x
+  then (
+    let n = to_int ~signed x in
+    fprintf fmt "{ %i }" n)
+  else (
+    let lguardints = guardints (Cudd.Bdd.manager x.(0)) ~signed x in
+    Print.list
+      ~first:"{ @[<v>"
+      ~sep:"@; "
+      ~last:"@] }"
+      (fun fmt (guard, code) -> fprintf fmt "%i IF %a" code print_bdd guard)
+      fmt
+      lguardints)
+;;
 
-let permute_memo memo reg tab =
-  Array.map (fun x -> Cudd.Bdd.permute ~memo x tab) reg
+let permute_memo memo reg tab = Array.map (fun x -> Cudd.Bdd.permute ~memo x tab) reg
 
 let permute ?memo reg tab =
   match memo with
   | Some memo -> permute_memo memo reg tab
   | None ->
-      let hash = Cudd.Hash.create 1 in
-      let memo = Cudd.Memo.Hash hash in
-      let res = permute_memo memo reg tab in
-      Cudd.Hash.clear hash;
-      res
+    let hash = Cudd.Hash.create 1 in
+    let memo = Cudd.Memo.Hash hash in
+    let res = permute_memo memo reg tab in
+    Cudd.Hash.clear hash;
+    res
+;;
 
-let varmap reg =
-  Array.map Cudd.Bdd.varmap reg
-
-let vectorcompose_memo memo tab reg =
-  Array.map (Cudd.Bdd.vectorcompose ~memo tab) reg
+let varmap reg = Array.map Cudd.Bdd.varmap reg
+let vectorcompose_memo memo tab reg = Array.map (Cudd.Bdd.vectorcompose ~memo tab) reg
 
 let vectorcompose ?memo tab reg =
   match memo with
   | Some memo -> vectorcompose_memo memo tab reg
   | None ->
-      let hash = Cudd.Hash.create 1 in
-      let memo = Cudd.Memo.Hash hash in
-      let res = vectorcompose_memo memo tab reg in
-      Cudd.Hash.clear hash;
-      res
+    let hash = Cudd.Hash.create 1 in
+    let memo = Cudd.Memo.Hash hash in
+    let res = vectorcompose_memo memo tab reg in
+    Cudd.Hash.clear hash;
+    res
+;;
 
 (*i \section{Tests} %====================================================== i*)
 

@@ -17,4 +17,3 @@ val get_inv : t -> Env.boolexpr_t
 
 (** refine location definition by the given expression *)
 val refine_inv : Env.t -> t -> Env.boolexpr_t -> t
-

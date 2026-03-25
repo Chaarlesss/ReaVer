@@ -3,6 +3,7 @@
 (** Same interface as {!DMappe}. *)
 
 type ('a, 'b) t
+
 val mapx : ('a, 'b) t -> ('a, 'b) PMappe.t
 val mapy : ('a, 'b) t -> ('b, 'a) PMappe.t
 val is_empty : ('a, 'b) t -> bool
@@ -30,14 +31,16 @@ val equaly : ('a, 'b) t -> ('a, 'b) t -> bool
 val subsetx : ('a, 'b) t -> ('a, 'b) t -> bool
 val subsety : ('a, 'b) t -> ('a, 'b) t -> bool
 val cardinal : ('a, 'b) t -> int
-val print :
-  ?first:(unit, Format.formatter, unit) format ->
-  ?sep:(unit, Format.formatter, unit) format ->
-  ?last:(unit, Format.formatter, unit) format ->
-  ?firstbind:(unit, Format.formatter, unit) format ->
-  ?sepbind:(unit, Format.formatter, unit) format ->
-  ?lastbind:(unit, Format.formatter, unit) format ->
-  (Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'b -> unit) ->
-  Format.formatter -> ('a, 'b) t -> unit
 
+val print
+  :  ?first:(unit, Format.formatter, unit) format
+  -> ?sep:(unit, Format.formatter, unit) format
+  -> ?last:(unit, Format.formatter, unit) format
+  -> ?firstbind:(unit, Format.formatter, unit) format
+  -> ?sepbind:(unit, Format.formatter, unit) format
+  -> ?lastbind:(unit, Format.formatter, unit) format
+  -> (Format.formatter -> 'a -> unit)
+  -> (Format.formatter -> 'b -> unit)
+  -> Format.formatter
+  -> ('a, 'b) t
+  -> unit

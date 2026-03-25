@@ -14,8 +14,7 @@
   int
   normalform
   output
-  reg)
-)
+  reg))
 
 (env
  (dev

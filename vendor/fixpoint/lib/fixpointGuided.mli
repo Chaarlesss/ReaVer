@@ -6,15 +6,18 @@
 
 open FixpointType
 
-val analysis :
-    ('vertex, 'hedge, 'attr, 'arc) manager ->
-    ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t -> 'vertex PSette.t ->
-    (('hedge -> bool) -> ('vertex,'hedge) strategy) ->
-    ('vertex, 'hedge, 'attr, 'arc) output
-  (** Same as {!FixpointStd.analysis}, but with the technique of
+(** Same as {!FixpointStd.analysis}, but with the technique of
       Gopan and Reps published in Static Anlaysis Symposium,
       SAS'2007. *)
+val analysis
+  :  ('vertex, 'hedge, 'attr, 'arc) manager
+  -> ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t
+  -> 'vertex PSette.t
+  -> (('hedge -> bool) -> ('vertex, 'hedge) strategy)
+  -> ('vertex, 'hedge, 'attr, 'arc) output
 
-val add_active_hedges :
-  ('vertex, 'hedge, 'attr, 'arc) manager ->
-  ('vertex, 'hedge, 'attr, 'arc) graph -> ('hedge, unit) PHashhe.t -> bool
+val add_active_hedges
+  :  ('vertex, 'hedge, 'attr, 'arc) manager
+  -> ('vertex, 'hedge, 'attr, 'arc) graph
+  -> ('hedge, unit) PHashhe.t
+  -> bool

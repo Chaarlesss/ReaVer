@@ -2,5 +2,3 @@
    Please read the LICENSE file packaged in the distribution *)
 
 (** ReaVer main *)
-
-

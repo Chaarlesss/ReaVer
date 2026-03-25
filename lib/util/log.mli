@@ -3,15 +3,25 @@
 
 (** logging *)
 
-type level_t = Error | Warn | Info | Debug | Debug2 | Debug3 | Hidden
+type level_t =
+  | Error
+  | Warn
+  | Info
+  | Debug
+  | Debug2
+  | Debug3
+  | Hidden
 
-type print_format_t = Plain | Xml
+type print_format_t =
+  | Plain
+  | Xml
 
 (** logger: declare one logger per module *)
-type logger_t = 
-  {fmt: Format.formatter; 
-   module_name: string;
-   level: level_t}
+type logger_t =
+  { fmt : Format.formatter
+  ; module_name : string
+  ; level : level_t
+  }
 
 (** {2 Global configuration} *)
 
@@ -25,7 +35,6 @@ val globallevel_weaken : level_t ref
 
 (** output format *)
 val print_format : print_format_t ref
-
 
 (** {2 Logging functions} *)
 

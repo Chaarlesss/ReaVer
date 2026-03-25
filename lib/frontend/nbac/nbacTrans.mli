@@ -3,7 +3,5 @@
 
 (** frontend implementation: Hybrid NBAC *)
 
-
 val translate_prog : NbacExpr.prog -> Program.translate_t
-
 val parse : ?is_file:bool -> Program.parser_t

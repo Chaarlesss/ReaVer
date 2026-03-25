@@ -4,7 +4,10 @@
 (** DF to CF implementation: utilities for zero-crossing translation *)
 
 (** zero-crossing semantics *)
-type sem_t = AtZero | Contact | Crossing
+type sem_t =
+  | AtZero
+  | Contact
+  | Crossing
 
 (** translates a hybrid program with zero-crossings 
     to a logico-numerical hybrid automaton*)

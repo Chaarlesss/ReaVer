@@ -7,14 +7,14 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
-type timemeas_t = 
-  {mutable running: bool; 
-   mutable starttime: float;
-   mutable accutime: float}
+type timemeas_t =
+  { mutable running : bool
+  ; mutable starttime : float
+  ; mutable accutime : float
+  }
 
 val create : unit -> timemeas_t
 val start : timemeas_t -> unit
 val stop : timemeas_t -> unit
 val reset : timemeas_t -> unit
-
 val print : Format.formatter -> timemeas_t -> unit

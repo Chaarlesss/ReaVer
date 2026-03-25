@@ -1,57 +1,53 @@
 (** Symbol table, for string management *)
 
+(** Type of symbols (actually integers) *)
 type t
-  (** Type of symbols (actually integers) *)
 
-val add: string -> t
-  (** Returns the symbol associated to the given string, after having possibly
+(** Returns the symbol associated to the given string, after having possibly
     registered the string if it wasn't (in this case, the symbol is fresh
     symbol). *)
-    
-val exists: string -> bool
-  (** Is the string already registered ? *)
+val add : string -> t
 
-val of_string: string -> t
-  (** Returns the {e existing} symbol associated to the (registered)
+(** Is the string already registered ? *)
+val exists : string -> bool
+
+(** Returns the {e existing} symbol associated to the (registered)
     string. Raises [Not_found] otherwise. *)
+val of_string : string -> t
 
-val to_string: t -> string
-  (** Returns the string represented by the symbol. *)
+(** Returns the string represented by the symbol. *)
+val to_string : t -> string
 
-val print: Format.formatter -> t -> unit
-  (** Prints the symbol (its associated string). *)
+(** Prints the symbol (its associated string). *)
+val print : Format.formatter -> t -> unit
 
-val equal: t -> t -> bool
-  (** Equality test *)
+(** Equality test *)
+val equal : t -> t -> bool
 
-val compare: t -> t -> int
-  (** Comparison (do not correspond at all to alphabetic order, depend on the
+(** Comparison (do not correspond at all to alphabetic order, depend on the
     registration order of names in the module) *)
+val compare : t -> t -> int
 
-module HashedType: (Hashtbl.HashedType with type t=t)
-  (** To use hashtables on type [t] *)
+(** To use hashtables on type [t] *)
+module HashedType : Hashtbl.HashedType with type t = t
 
-module OrderedType: (Set.OrderedType with type t=t)
-  (** To use sets or maps on type [t] *)
+(** To use sets or maps on type [t] *)
+module OrderedType : Set.OrderedType with type t = t
 
-module Hash: (Hashtbl.S with type key=t)
-  (** Hashtables on type [t] *)
+(** Hashtables on type [t] *)
+module Hash : Hashtbl.S with type key = t
 
-module Set: (Sette.S with type elt=t)
-  (** Sets on type [t] *)
+(** Sets on type [t] *)
+module Set : Sette.S with type elt = t
 
-module Map: (Mappe.S with type key=t
-		     and module Setkey=Set)
-  (** Maps on type [t] *)
+(** Maps on type [t] *)
+module Map : Mappe.S with type key = t and module Setkey = Set
 
-val print_set: Format.formatter -> Set.t -> unit
-  (** Prints sets of symbols. *)
+(** Prints sets of symbols. *)
+val print_set : Format.formatter -> Set.t -> unit
 
-val print_hash: 
-    (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Hash.t -> unit
-  (** Prints hashtables on symbols. *)
+(** Prints hashtables on symbols. *)
+val print_hash : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Hash.t -> unit
 
-val print_map: 
-    (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Map.t -> unit
-  (** Prints maps on symbols. *)
-
+(** Prints maps on symbols. *)
+val print_map : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Map.t -> unit

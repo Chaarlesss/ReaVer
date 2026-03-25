@@ -16,7 +16,7 @@ val enumerate : Env.var_t list -> VerifUtil.trans_t
     (computes the arc assertions) *)
 val refine_by_destloc : VerifUtil.trans_t
 
-(** boolean backward bisimulation refinement *) 
+(** boolean backward bisimulation refinement *)
 val boolbacksim : VerifUtil.trans_t
 
 (** removes boolean inputs and splits arcs *)

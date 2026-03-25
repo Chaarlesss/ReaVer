@@ -1,4 +1,4 @@
-(lang dune 3.6)
+(lang dune 3.22)
 
 (generate_opam_files true)
 
@@ -9,13 +9,13 @@
  (version 0.9.4)
  (license "GPL-3.0")
  (authors "Peter Shrammel")
- (maintainers "Pavlo Tokariev <pavlo.tokariev@inria.fr>")
+ (maintainers "Charles de Haro <deharo@di.ens.fr>")
  (synopsis "ReaVer is a tool framework for safety verification of discrete and hybrid systems")
  (source
-  (github PaulRaUnite/reaver))
+  (github Chaarlesss/ReaVer))
  (depends
   (ocaml
-   (>= 4.08))
+   (>= 5.4))
   dune
   camllib
   bddapron

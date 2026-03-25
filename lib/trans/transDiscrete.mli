@@ -10,5 +10,3 @@ val modes_bool1 : Env.vars_t -> VerifUtil.trans_t
 (** partitions by the Boolean-defined numerical modes (for the given
     set of numerical variables) *)
 val modes_bool2 : Env.vars_t -> VerifUtil.trans_t
-
-

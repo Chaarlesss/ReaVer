@@ -7,5 +7,4 @@ exception NotSupported of string
 exception NotPurelyNumerical
 
 (** {2 module Num: numerical max-strategy iteration} *)
-module Num(Dom :  Template.TEMPLATE_T) :
-  (Analysis.T with type analysisparam_t = bool)
+module Num (Dom : Template.TEMPLATE_T) : Analysis.T with type analysisparam_t = bool

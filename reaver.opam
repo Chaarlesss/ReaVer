@@ -3,14 +3,14 @@ opam-version: "2.0"
 version: "0.9.4"
 synopsis:
   "ReaVer is a tool framework for safety verification of discrete and hybrid systems"
-maintainer: ["Pavlo Tokariev <pavlo.tokariev@inria.fr>"]
+maintainer: ["Charles de Haro <deharo@di.ens.fr>"]
 authors: ["Peter Shrammel"]
 license: "GPL-3.0"
-homepage: "https://github.com/PaulRaUnite/reaver"
-bug-reports: "https://github.com/PaulRaUnite/reaver/issues"
+homepage: "https://github.com/Chaarlesss/ReaVer"
+bug-reports: "https://github.com/Chaarlesss/ReaVer/issues"
 depends: [
-  "ocaml" {>= "4.08"}
-  "dune" {>= "3.6"}
+  "ocaml" {>= "5.4"}
+  "dune" {>= "3.22"}
   "camllib"
   "bddapron"
   "apron" {>= "0.9.15"}
@@ -32,11 +32,5 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/PaulRaUnite/reaver.git"
-pin-depends: [
-  ["ocamlyices.0.7.4" "git+https://github.com/paulraunite/ocamlyices"]
-  ["camllib.1.4.0" "git+https://github.com/paulraunite/camllib"]
-  ["fixpoint.2.3.3" "git+https://github.com/paulraunite/fixpoint"]
-  ["ocamlqsopt_ex.0.9.4" "./vendor/ocamlqsopt_ex"]
-  ["bddapron.2.4.0" "git+https://github.com/paulraunite/bddapron"]
-]
+dev-repo: "git+https://github.com/Chaarlesss/ReaVer.git"
+x-maintenance-intent: ["(latest)"]

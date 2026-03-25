@@ -7,11 +7,8 @@ exception NotSupported of string
 exception NotPurelyNumerical
 
 (** {2 module Num: (discrete/hybrid) numerical max-strategy iteration} *)
-module Num(Dom :  Template.TEMPLATE_T) :
-  (Analysis.T with type analysisparam_t = unit)
+module Num (Dom : Template.TEMPLATE_T) : Analysis.T with type analysisparam_t = unit
 
 (** {2 module Lognum: (discrete/hybrid) 
        logico-numerical max-strategy iteration} *)
-module Lognum(Dom :  Template.TEMPLATE_T) :
-  (Analysis.T with type analysisparam_t = unit)
-
+module Lognum (Dom : Template.TEMPLATE_T) : Analysis.T with type analysisparam_t = unit

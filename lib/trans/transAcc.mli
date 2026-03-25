@@ -3,7 +3,10 @@
 (** decoupling mode: no decoupling, decoupling of Boolean and
     accelerable equations, decoupling of Boolean/non-accelerable and
     accelerable equations *)
-type decoupling_mode_t = DecoupleNone | DecoupleBool | DecoupleBoolNacc
+type decoupling_mode_t =
+  | DecoupleNone
+  | DecoupleBool
+  | DecoupleBoolNacc
 
 (** remove Boolean inputs and classify accelerable self-loops *)
 val remove_bool_inputs : decoupling_mode_t -> VerifUtil.trans_t

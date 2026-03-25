@@ -3,4 +3,4 @@
 
 (** Lexical analysis of expressions, constraints, generators *)
 
-val token: Lexing.lexbuf -> Parser.token
+val token : Lexing.lexbuf -> Parser.token

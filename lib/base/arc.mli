@@ -3,19 +3,18 @@
 
 (** framework base: arcs of control flow graphs *)
 
-type t = 
-    |Normal of Env.boolexpr_t * Env.equs_t 
-    |Loop of Env.boolexpr_t * Env.equs_t
-    |Accel of Env.boolexpr_t * Env.equs_t
-    |BoolAccel of Env.boolexpr_t * Env.equs_t
-    |BoolNaccAccel of Env.boolexpr_t * Env.equs_t
-    |Bool of Env.boolexpr_t * Env.equs_t
-    |BoolNacc of Env.boolexpr_t * Env.equs_t
-    |Nonacc of Env.boolexpr_t * Env.equs_t
-    |Id
-    |Flow of Env.boolexpr_t * Env.equs_t
-    |Apron of Env.boolexpr_t * (ApronUtil.equs_t * Env.equs_t)
-
+type t =
+  | Normal of Env.boolexpr_t * Env.equs_t
+  | Loop of Env.boolexpr_t * Env.equs_t
+  | Accel of Env.boolexpr_t * Env.equs_t
+  | BoolAccel of Env.boolexpr_t * Env.equs_t
+  | BoolNaccAccel of Env.boolexpr_t * Env.equs_t
+  | Bool of Env.boolexpr_t * Env.equs_t
+  | BoolNacc of Env.boolexpr_t * Env.equs_t
+  | Nonacc of Env.boolexpr_t * Env.equs_t
+  | Id
+  | Flow of Env.boolexpr_t * Env.equs_t
+  | Apron of Env.boolexpr_t * (ApronUtil.equs_t * Env.equs_t)
 
 (** {2 Printing} *)
 

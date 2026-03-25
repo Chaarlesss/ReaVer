@@ -20,8 +20,8 @@ let default_strat_h = "aB;aB:b;pIF;pMHB;pQ;rT;aH:ws=5"
 let all_labels decl =
   PMappe.fold
     (fun (typ : NbacExpr.symtype) (def : NbacExpr.typdef) accuset ->
-      match def with
-      | `Benum edef -> Sette.union accuset (Util.array2sette edef))
+       match def with
+       | `Benum edef -> Sette.union accuset (Util.array2sette edef))
     decl.Program.typdef
     Sette.empty
 ;;
@@ -52,7 +52,6 @@ let sort_eqs eqs statevars inputvars labels =
   (*  Log.debug3_o logger (fun fmt vars -> Mappe.print Format.pp_print_string
       (Sette.print Format.pp_print_string) fmt vars)
       "dependencies: " eqs_vars1;*)
-
   (* remove dependencies on state and input variables (and labels)*)
   let eqs_vars2 =
     Mappe.mapi
@@ -62,7 +61,6 @@ let sort_eqs eqs statevars inputvars labels =
   (*  Log.debug3_o logger (fun fmt vars -> Mappe.print Format.pp_print_string
       (Sette.print Format.pp_print_string) fmt vars)
       "dependencies without state and input variables: " eqs_vars2;*)
-
   (* sort equations by cutting arcs in the graph *)
   let rec sort eqs_varset =
     let indep, dep = Mappe.partition (fun k v -> Sette.is_empty v) eqs_varset in
@@ -96,9 +94,9 @@ let translate_expr env expr treqs zeros =
   let cond0 = env.Env.cond in
   (* recursively goes through the abstract syntax tree *)
   let rec traverse
-    (expr : NbacExpr.symtype NbacExpr.expr)
-    (treqs : (NbacExpr.symtype * NbacExpr.symtype Bddapron.Expr0.t) list)
-    (zeros : Env.zerodefs_t)
+            (expr : NbacExpr.symtype NbacExpr.expr)
+            (treqs : (NbacExpr.symtype * NbacExpr.symtype Bddapron.Expr0.t) list)
+            (zeros : Env.zerodefs_t)
     : NbacExpr.symtype Bddapron.Expr0.t * Env.zerodefs_t
     =
     (*    Log.debug3_o logger (NbacExpr.print_expr)
@@ -220,16 +218,16 @@ let translate_expr env expr treqs zeros =
              | _ -> failwith "type mismatch in comparison operator"))
        | `Apron (binop, typ, round) ->
          let app_apron_binop
-           (op :
-             NbacExpr.symtype Bddapron.Env.t
-             -> NbacExpr.symtype Bddapron.Cond.t
-             -> ?typ:Apron.Texpr1.typ
-             -> ?round:Apron.Texpr1.round
-             -> NbacExpr.symtype Bddapron.Expr0.Apron.t
-             -> NbacExpr.symtype Bddapron.Expr0.Apron.t
-             -> NbacExpr.symtype Bddapron.Expr0.Apron.t)
-           e1
-           e2
+               (op :
+                 NbacExpr.symtype Bddapron.Env.t
+                 -> NbacExpr.symtype Bddapron.Cond.t
+                 -> ?typ:Apron.Texpr1.typ
+                 -> ?round:Apron.Texpr1.round
+                 -> NbacExpr.symtype Bddapron.Expr0.Apron.t
+                 -> NbacExpr.symtype Bddapron.Expr0.Apron.t
+                 -> NbacExpr.symtype Bddapron.Expr0.Apron.t)
+               e1
+               e2
            =
            op env0 cond0 ~typ ~round e1 e2
          in
@@ -281,8 +279,8 @@ let translate_expr env expr treqs zeros =
       let trlist, zs =
         List.fold_right
           (fun e (trlist, zs) ->
-            let ee, zs = tr_boolexpr e zs in
-            ee :: trlist, zs)
+             let ee, zs = tr_boolexpr e zs in
+             ee :: trlist, zs)
           le
           ([], zeros)
       in
@@ -290,11 +288,11 @@ let translate_expr env expr treqs zeros =
       let allfalse trlrest =
         List.fold_left
           (fun e1 e2 ->
-            Bddapron.Expr0.Bool.dand
-              env0
-              cond0
-              (Bddapron.Expr0.Bool.dnot env0 cond0 e1)
-              e2)
+             Bddapron.Expr0.Bool.dand
+               env0
+               cond0
+               (Bddapron.Expr0.Bool.dnot env0 cond0 e1)
+               e2)
           (Bddapron.Expr0.Bool.dtrue env0 cond0)
           trlrest
       in
@@ -325,8 +323,9 @@ let translate_expr env expr treqs zeros =
       let tr, zs =
         List.fold_right
           (fun e (tr, zs) ->
-            let e, zs = traverse e treqs zs in
-            Bddapron.Expr0.Bool.dor env0 cond0 tr (Bddapron.Expr0.eq env0 cond0 tre e), zs)
+             let e, zs = traverse e treqs zs in
+             ( Bddapron.Expr0.Bool.dor env0 cond0 tr (Bddapron.Expr0.eq env0 cond0 tre e)
+             , zs ))
           le
           (Bddapron.Expr0.Bool.dfalse env0 cond0, zs)
       in
@@ -344,20 +343,20 @@ let translate_prog prog env =
   Log.debug3_o
     logger
     (fun fmt defs ->
-      Mappe.iter
-        (fun a b ->
-          Format.print_string a;
-          Format.print_string " = ";
-          NbacExpr.print_expr fmt b)
-        defs)
+       Mappe.iter
+         (fun a b ->
+            Format.print_string a;
+            Format.print_string " = ";
+            NbacExpr.print_expr fmt b)
+         defs)
     ""
     prog.NbacExpr.defs;
   let labels = all_labels prog.NbacExpr.decl in
   let trdefs, zeros0 =
     List.fold_left
       (fun (treq, zzs) (v, e) ->
-        let ee, zs = translate_expr env e treq zzs in
-        (v, ee) :: treq, zs)
+         let ee, zs = translate_expr env e treq zzs in
+         (v, ee) :: treq, zs)
       ([], [])
       (sort_eqs
          prog.NbacExpr.defs
@@ -370,25 +369,25 @@ let translate_prog prog env =
   Log.debug3_o
     logger
     (fun fmt defs ->
-      Mappe.iter
-        (fun a b ->
-          Format.print_string a;
-          Format.print_string " = ";
-          NbacExpr.print_expr fmt b)
-        defs)
+       Mappe.iter
+         (fun a b ->
+            Format.print_string a;
+            Format.print_string " = ";
+            NbacExpr.print_expr fmt b)
+         defs)
     ""
     prog.NbacExpr.jump;
   (* translate transitions, use 'trdefs' to substitute local variables *)
   let jump, zeros1 =
     List.fold_right
       (fun (v, e) (eqs, zzs) ->
-        let ee, zs = translate_expr env e trdefs zzs in
-        Log.debug3_o
-          logger
-          (Env.print_zero_defs env)
-          ("zero_defs in " ^ v ^ " equation: ")
-          zs;
-        (v, ee) :: eqs, zs)
+         let ee, zs = translate_expr env e trdefs zzs in
+         Log.debug3_o
+           logger
+           (Env.print_zero_defs env)
+           ("zero_defs in " ^ v ^ " equation: ")
+           zs;
+         (v, ee) :: eqs, zs)
       (Util.mappe2list prog.NbacExpr.jump)
       ([], zeros0)
   in
@@ -396,8 +395,8 @@ let translate_prog prog env =
   let flow, zeros =
     List.fold_right
       (fun (v, e) (eqs, zzs) ->
-        let ee, zs = translate_expr env e trdefs zzs in
-        (v, ee) :: eqs, zs)
+         let ee, zs = translate_expr env e trdefs zzs in
+         (v, ee) :: eqs, zs)
       (Util.mappe2list prog.NbacExpr.flow)
       ([], zeros1)
   in

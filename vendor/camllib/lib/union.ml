@@ -1,52 +1,46 @@
 (** Union-find Abstract Data Types *)
 
-type 'a t = ('a,'a) Hashtbl.t
-	(** The type of the sets of all elements *)
+(** The type of the sets of all elements *)
+type 'a t = ('a, 'a) Hashtbl.t
 
 let create n = Hashtbl.create n
-
 let add tbl elt = Hashtbl.add tbl elt elt
 
 let find tbl element =
   let parent = Hashtbl.find tbl element in
-  if parent=element then
-    element
-  else begin
+  if parent = element
+  then element
+  else (
     let parent2 = Hashtbl.find tbl parent in
-    if parent2 = parent then
-      parent
-    else begin
+    if parent2 = parent
+    then parent
+    else (
       (* The find function *)
       let rec findrec element =
-	let parent = Hashtbl.find tbl element in
-	if parent=element then
-	  element
-	else
-	  findrec parent
+        let parent = Hashtbl.find tbl element in
+        if parent = element then element else findrec parent
       in
       (* The path compression function *)
       let rec compressrec res element =
-	let parent = Hashtbl.find tbl element in
-	if parent = element then
-	  ()
-	else begin
-	  Hashtbl.replace tbl element res;
-	  compressrec res parent
-	end
+        let parent = Hashtbl.find tbl element in
+        if parent = element
+        then ()
+        else (
+          Hashtbl.replace tbl element res;
+          compressrec res parent)
       in
       (* The algorithm *)
       let res = findrec parent2 in
       compressrec res element;
-      res
-    end
-  end
+      res))
+;;
 
 let union tbl element1 element2 =
-  let root1 = find tbl element1 and
-      root2 = find tbl element2
-  in
+  let root1 = find tbl element1
+  and root2 = find tbl element2 in
   Hashtbl.replace tbl root1 root2;
   root2
+;;
 
 let extract tbl =
   let size =
@@ -60,14 +54,12 @@ let extract tbl =
     tbl2
   in
   Hashtbl.iter
-    (begin fun elt parent ->
-      let parent = find tbl parent in
-      let list = Hashtbl.find tbl2 parent in
-      Hashtbl.replace tbl2 parent (elt::list)
-    end)
+    (fun elt parent ->
+       let parent = find tbl parent in
+       let list = Hashtbl.find tbl2 parent in
+       Hashtbl.replace tbl2 parent (elt :: list))
     tbl;
   let res = ref [] in
-  Hashtbl.iter
-    (fun _ list -> if list<>[] then res := list :: !res)
-    tbl2;
+  Hashtbl.iter (fun _ list -> if list <> [] then res := list :: !res) tbl2;
   !res
+;;

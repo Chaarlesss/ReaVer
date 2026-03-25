@@ -33,71 +33,60 @@
     }
 *)
 
-type ('vertex,'hedge,'abstract,'arc) manager =
-  ('vertex,'hedge,'abstract,'arc) FixpointType.manager = {
-  mutable bottom : 'vertex -> 'abstract;
-      (** Create a bottom value *)
-  mutable canonical : 'vertex -> 'abstract -> unit;
-      (** Make an abstract value canonical *)
-  mutable is_bottom : 'vertex -> 'abstract -> bool;
-      (** Emptiness test *)
-  mutable is_leq : 'vertex -> 'abstract -> 'abstract -> bool;
-      (** Inclusion test *)
-  mutable join :  'vertex -> 'abstract -> 'abstract -> 'abstract;
-  mutable join_list : 'vertex -> 'abstract list -> 'abstract;
-      (** Binary and n-ary join operation *)
-  mutable widening : 'vertex -> 'abstract -> 'abstract -> 'abstract;
-      (** Apply widening at the given point, with the two arguments.
+type ('vertex, 'hedge, 'abstract, 'arc) manager =
+      ('vertex, 'hedge, 'abstract, 'arc) FixpointType.manager =
+  { mutable bottom : 'vertex -> 'abstract (** Create a bottom value *)
+  ; mutable canonical : 'vertex -> 'abstract -> unit
+    (** Make an abstract value canonical *)
+  ; mutable is_bottom : 'vertex -> 'abstract -> bool (** Emptiness test *)
+  ; mutable is_leq : 'vertex -> 'abstract -> 'abstract -> bool (** Inclusion test *)
+  ; mutable join : 'vertex -> 'abstract -> 'abstract -> 'abstract
+  ; mutable join_list : 'vertex -> 'abstract list -> 'abstract
+    (** Binary and n-ary join operation *)
+  ; mutable widening : 'vertex -> 'abstract -> 'abstract -> 'abstract
+    (** Apply widening at the given point, with the two arguments.
 	  Widening will always be applied with first argument being included
 	  in the second one. *)
-  mutable odiff :  ('vertex -> 'abstract -> 'abstract -> 'abstract) option;
-      (** Sound approximation of set difference (optional) *)
-  mutable abstract_init : 'vertex -> 'abstract;
-      (** Return the non-bottom initial value associated to the given vertex *)
-  mutable arc_init : 'hedge -> 'arc;
-      (** Initial value for arcs *)
-  mutable apply : 'hedge -> 'abstract array -> 'arc * 'abstract;
-      (** Apply the function indexed by [hedge] to the array of arguments.
+  ; mutable odiff : ('vertex -> 'abstract -> 'abstract -> 'abstract) option
+    (** Sound approximation of set difference (optional) *)
+  ; mutable abstract_init : 'vertex -> 'abstract
+    (** Return the non-bottom initial value associated to the given vertex *)
+  ; mutable arc_init : 'hedge -> 'arc (** Initial value for arcs *)
+  ; mutable apply : 'hedge -> 'abstract array -> 'arc * 'abstract
+    (** Apply the function indexed by [hedge] to the array of arguments.
 
 	  It returns the new abstract value, but also a user-defined information
 	  that will be associated to the hyperedge in the result. *)
-
-  mutable print_vertex : Format.formatter -> 'vertex -> unit;
-  mutable print_hedge : Format.formatter -> 'hedge -> unit;
-  mutable print_abstract: Format.formatter -> 'abstract -> unit;
-  mutable print_arc: Format.formatter -> 'arc -> unit;
-      (** Printing functions *)
-
-  mutable accumulate : bool;
-	(** If true, during ascending phase, compute the union of old reachable
+  ; mutable print_vertex : Format.formatter -> 'vertex -> unit
+  ; mutable print_hedge : Format.formatter -> 'hedge -> unit
+  ; mutable print_abstract : Format.formatter -> 'abstract -> unit
+  ; mutable print_arc : Format.formatter -> 'arc -> unit (** Printing functions *)
+  ; mutable accumulate : bool
+    (** If true, during ascending phase, compute the union of old reachable
 	    value with growing incoming hyperedges. If false, recompute all
 	    incoming hyperedges. *)
-
-  mutable print_fmt : Format.formatter;
-	(** Typically equal to [Format.std_formatter] *)
-  mutable print_analysis : bool;
-  mutable print_component : bool;
-  mutable print_step : bool;
-  mutable print_state : bool;
-  mutable print_postpre : bool;
-  mutable print_workingsets : bool;
-      (** Printing Options *)
-
-  mutable dot_fmt : Format.formatter option;
-	(** [Some fmt] enables DOT output. You can set dummy
+  ; mutable print_fmt : Format.formatter (** Typically equal to [Format.std_formatter] *)
+  ; mutable print_analysis : bool
+  ; mutable print_component : bool
+  ; mutable print_step : bool
+  ; mutable print_state : bool
+  ; mutable print_postpre : bool
+  ; mutable print_workingsets : bool (** Printing Options *)
+  ; mutable dot_fmt : Format.formatter option
+    (** [Some fmt] enables DOT output. You can set dummy
 	    values to the fields below if you always set [None]
 	    and you do not want DOT output. *)
-  mutable dot_vertex : Format.formatter -> 'vertex -> unit;
-      (** Print vertex identifiers in DOT format *)
-  mutable dot_hedge : Format.formatter -> 'hedge -> unit;
-      (** Print hyperedge identifiers in DOT format (vertices and
+  ; mutable dot_vertex : Format.formatter -> 'vertex -> unit
+    (** Print vertex identifiers in DOT format *)
+  ; mutable dot_hedge : Format.formatter -> 'hedge -> unit
+    (** Print hyperedge identifiers in DOT format (vertices and
 	  hyperedges identifiers should be different, as they are
 	  represented by DOT vertices *)
-  mutable dot_attrvertex : Format.formatter -> 'vertex -> unit;
-      (** Print the displayed information in boxes *)
-  mutable dot_attrhedge : Format.formatter -> 'hedge -> unit;
-      (** Print the displayed information for hyperedges *)
-}
+  ; mutable dot_attrvertex : Format.formatter -> 'vertex -> unit
+    (** Print the displayed information in boxes *)
+  ; mutable dot_attrhedge : Format.formatter -> 'hedge -> unit
+    (** Print the displayed information for hyperedges *)
+  }
 
 (*  ====================================================================== *)
 (** {3 Static equation system} *)
@@ -110,49 +99,41 @@ type ('vertex,'hedge,'abstract,'arc) manager =
 (** {3 Dynamically explored equation system} *)
 (*  ====================================================================== *)
 
-type ('vertex,'hedge) equation =
-  'vertex -> ('hedge, 'vertex array * 'vertex) PMappe.t
-    (** Function that explores dynamically an equation system.
+(** Function that explores dynamically an equation system.
 	[equation vertex] returns a map hat associates to each
 	successor hyperedge a pair of composed of the set of
 	predecessor vertices, and the successor vertex.  *)
+type ('vertex, 'hedge) equation = 'vertex -> ('hedge, 'vertex array * 'vertex) PMappe.t
 
 (*  ====================================================================== *)
 (** {3 Iteration strategies} *)
 (*  ====================================================================== *)
 
 (** Widening and Descending Options *)
-type strategy_iteration = FixpointType.strategy_iteration = {
-  mutable widening_start : int;
+type strategy_iteration = FixpointType.strategy_iteration =
+  { mutable widening_start : int
     (** Nb of initial steps without widening in the current strategy *)
-  mutable widening_descend : int;
+  ; mutable widening_descend : int
     (** Maximum nb. of descending steps in the current strategy *)
-  mutable ascending_nb : int;
-    (** For stats *)
-  mutable descending_nb : int;
-    (** For stats *)
-  mutable descending_stable : bool;
-    (** For stats *)
-}
+  ; mutable ascending_nb : int (** For stats *)
+  ; mutable descending_nb : int (** For stats *)
+  ; mutable descending_stable : bool (** For stats *)
+  }
 
-type ('vertex,'hedge) strategy_vertex =
-  ('vertex,'hedge) FixpointType.strategy_vertex = {
-  mutable vertex : 'vertex;
-  mutable hedges : 'hedge list;
-      (** Order in which the incoming hyperedges will be applied *)
-  mutable widen : bool;
-      (** Should this vertex be a widening point ? *)
-}
-  (** Strategy to be applied for the vertex [vertex].
+(** Strategy to be applied for the vertex [vertex].
     - [hedges] is a list of incoming hyperedges. The effect of hyperedges are
       applied "in parallel" and the destination vertex is updated. Be cautious:
       if an incoming hyperedge is forgotten in this list, it won't be taken
       into account in the analysis.
     - [widen] specifies whether the vertex is a widening point or not.  *)
+type ('vertex, 'hedge) strategy_vertex = ('vertex, 'hedge) FixpointType.strategy_vertex =
+  { mutable vertex : 'vertex
+  ; mutable hedges : 'hedge list
+    (** Order in which the incoming hyperedges will be applied *)
+  ; mutable widen : bool (** Should this vertex be a widening point ? *)
+  }
 
-type ('vertex,'hedge) strategy =
-    (strategy_iteration, ('vertex,'hedge) strategy_vertex) Ilist.t
-    (** Type for defining iteration strategies.  For instance, [[1; [2;3]; 4;
+(** Type for defining iteration strategies.  For instance, [[1; [2;3]; 4;
       [5]; 6]] means:
       - update [1];
       - update [2] then [3], and loop until stabilization;
@@ -181,40 +162,34 @@ type ('vertex,'hedge) strategy =
 	before going on with [5].
 
     *)
+type ('vertex, 'hedge) strategy =
+  (strategy_iteration, ('vertex, 'hedge) strategy_vertex) Ilist.t
 
 (*  ====================================================================== *)
 (** {3 Output} *)
 (*  ====================================================================== *)
 
-type stat_iteration = FixpointType.stat_iteration = {
-  mutable nb: int;
-  mutable stable: bool;
-}
-type stat = FixpointType.stat = {
-  mutable time : float;
-  mutable ascending : (stat_iteration,unit) Ilist.t;
-  mutable descending : (stat_iteration,unit) Ilist.t;
-}
-  (** statistics at the end of the analysis *)
+type stat_iteration = FixpointType.stat_iteration =
+  { mutable nb : int
+  ; mutable stable : bool
+  }
 
-type ('vertex,'hedge,'abstract,'arc) output =
-    ('vertex,'hedge,'abstract,'arc, stat) PSHGraph.t
-      (** result of the analysis *)
+(** statistics at the end of the analysis *)
+type stat = FixpointType.stat =
+  { mutable time : float
+  ; mutable ascending : (stat_iteration, unit) Ilist.t
+  ; mutable descending : (stat_iteration, unit) Ilist.t
+  }
+
+(** result of the analysis *)
+type ('vertex, 'hedge, 'abstract, 'arc) output =
+  ('vertex, 'hedge, 'abstract, 'arc, stat) PSHGraph.t
 
 (*  ********************************************************************** *)
 (** {2 Functions} *)
 (*  ********************************************************************** *)
 
-val make_strategy_default :
-  ?depth:int ->
-  ?widening_start:int ->
-  ?widening_descend:int ->
-  ?priority:'hedge PSHGraph.priority ->
-  vertex_dummy:'vertex ->
-  hedge_dummy:'hedge ->
-  ('vertex, 'hedge, 'e,'f,'g) PSHGraph.t -> 'vertex PSette.t ->
-  ('vertex, 'hedge) strategy
-    (**
+(**
 
        Build a "default" strategy, with the following options:
 
@@ -236,13 +211,18 @@ val make_strategy_default :
        One known usage for filtering: guided analysis, where one analyse
        a subgraph of the equation graph.
     *)
+val make_strategy_default
+  :  ?depth:int
+  -> ?widening_start:int
+  -> ?widening_descend:int
+  -> ?priority:'hedge PSHGraph.priority
+  -> vertex_dummy:'vertex
+  -> hedge_dummy:'hedge
+  -> ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t
+  -> 'vertex PSette.t
+  -> ('vertex, 'hedge) strategy
 
-val analysis_std :
-  ('vertex, 'hedge, 'abstract, 'arc) manager ->
-  ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t -> 'vertex PSette.t ->
-  ('vertex, 'hedge) strategy ->
-  ('vertex, 'hedge, 'abstract,'arc) output
-    (** Performs initialization, fixpoint analysis and descending,
+(** Performs initialization, fixpoint analysis and descending,
 	and measures the global analysis time.
 
 	[analysis_std manager graph sinit strategy] takes a graph
@@ -251,13 +231,14 @@ val analysis_std :
 	(super)set [sinit] of the variables to be initialized to a
 	non-empty value, and an iteration strategy [strategy].
     *)
+val analysis_std
+  :  ('vertex, 'hedge, 'abstract, 'arc) manager
+  -> ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t
+  -> 'vertex PSette.t
+  -> ('vertex, 'hedge) strategy
+  -> ('vertex, 'hedge, 'abstract, 'arc) output
 
-val analysis_guided :
-  ('vertex, 'hedge, 'attr, 'arc) manager ->
-  ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t -> 'vertex PSette.t ->
-  (('hedge -> bool) -> ('vertex,'hedge) strategy) ->
-  ('vertex, 'hedge, 'attr, 'arc) output
-    (** Same as {!analysis_std}, but with the technique of
+(** Same as {!analysis_std}, but with the technique of
 	Gopan and Reps published in Static Anlaysis Symposium,
 	SAS'2007.
 
@@ -269,57 +250,72 @@ val analysis_guided :
 	the argument [make_strategy] is [(fun p ->
 	make_strategy_default ~priority:(PSHGraph.Filter p) vdummy
 	hdummy graph sinit)].  *)
+val analysis_guided
+  :  ('vertex, 'hedge, 'attr, 'arc) manager
+  -> ('vertex, 'hedge, 'e, 'f, 'g) PSHGraph.t
+  -> 'vertex PSette.t
+  -> (('hedge -> bool) -> ('vertex, 'hedge) strategy)
+  -> ('vertex, 'hedge, 'attr, 'arc) output
 
-val equation_of_graph :
-  ?filter:('hedge -> bool) ->
-  ('vertex, 'hedge, 'attr, 'arc, 'e) PSHGraph.t ->
-  ('vertex, 'hedge) equation
-    (** Generate from a graph a function of type [('vertex,
+(** Generate from a graph a function of type [('vertex,
 	'hedge) equation] or dynamically exploring the graph.  The
 	[filter] function allows to select a part of the graph. *)
+val equation_of_graph
+  :  ?filter:('hedge -> bool)
+  -> ('vertex, 'hedge, 'attr, 'arc, 'e) PSHGraph.t
+  -> ('vertex, 'hedge) equation
 
-val graph_of_equation :
-  ('vertex, 'hedge) PSHGraph.compare ->
-  ?filter:('hedge -> bool) ->
-  make_attrvertex:('vertex -> 'attr) ->
-  make_attrhedge:('hedge -> 'arc) ->
-  info:'e ->
-  ('vertex, 'hedge) equation ->
-  'vertex PSette.t -> ('vertex, 'hedge, 'attr, 'arc, 'e) PSHGraph.t
-  (** Generate from an equation a graph, using
+(** Generate from an equation a graph, using
       [make_attrvertex], [make_attrhedge] and [info]. *)
+val graph_of_equation
+  :  ('vertex, 'hedge) PSHGraph.compare
+  -> ?filter:('hedge -> bool)
+  -> make_attrvertex:('vertex -> 'attr)
+  -> make_attrhedge:('hedge -> 'arc)
+  -> info:'e
+  -> ('vertex, 'hedge) equation
+  -> 'vertex PSette.t
+  -> ('vertex, 'hedge, 'attr, 'arc, 'e) PSHGraph.t
 
-val analysis_dyn :
-  ('a, 'b) SHGraph.compare ->
-  guided:bool ->
-  ('a, 'b, 'c, 'd) manager ->
-  ('a, 'b) equation -> 'a PSette.t ->
-  (('a, 'b, 'c, 'd) FixpointType.graph -> ('a, 'b) strategy) ->
-  ('a, 'b, 'c, 'd) output
-    (** Dynamic analysis. *)
+(** Dynamic analysis. *)
+val analysis_dyn
+  :  ('a, 'b) SHGraph.compare
+  -> guided:bool
+  -> ('a, 'b, 'c, 'd) manager
+  -> ('a, 'b) equation
+  -> 'a PSette.t
+  -> (('a, 'b, 'c, 'd) FixpointType.graph -> ('a, 'b) strategy)
+  -> ('a, 'b, 'c, 'd) output
 
 (*  ********************************************************************** *)
 (** {2 Printing Functions} *)
 (*  ********************************************************************** *)
 
-val print_strategy_vertex :
-  ('a, 'b, 'c, 'd) manager ->
-  Format.formatter -> ('a, 'b) strategy_vertex -> unit
-  (** [print_strategy_vertex man fmt sv] prints an object of type
+(** [print_strategy_vertex man fmt sv] prints an object of type
       [strategy_vertex], using the manager [man] for printing vertices and
       hyperedges.  The output has the form [(boolean,vertex,[list of list of
       hedges])].  *)
+val print_strategy_vertex
+  :  ('a, 'b, 'c, 'd) manager
+  -> Format.formatter
+  -> ('a, 'b) strategy_vertex
+  -> unit
 
-val print_strategy :
-  ('a, 'b, 'c, 'd) manager -> Format.formatter -> ('a, 'b) strategy -> unit
-  (** [print_strategy_vertex man fmt sv] prints an object of type
+(** [print_strategy_vertex man fmt sv] prints an object of type
       [strategy], using the manager [man] for printing vertices and
       hyperedges. *)
+val print_strategy
+  :  ('a, 'b, 'c, 'd) manager
+  -> Format.formatter
+  -> ('a, 'b) strategy
+  -> unit
 
+(** Prints statistics *)
 val print_stat : Format.formatter -> stat -> unit
-  (** Prints statistics *)
 
-val print_output :
-  ('vertex, 'hedge, 'attr, 'arc) manager ->
-  Format.formatter -> ('vertex, 'hedge, 'attr, 'arc) output -> unit
-      (** Prints the result of an analysis. *)
+(** Prints the result of an analysis. *)
+val print_output
+  :  ('vertex, 'hedge, 'attr, 'arc) manager
+  -> Format.formatter
+  -> ('vertex, 'hedge, 'attr, 'arc) output
+  -> unit

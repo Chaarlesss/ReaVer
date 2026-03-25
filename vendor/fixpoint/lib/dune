@@ -1,5 +1,5 @@
 (library
-  (name fixpoint)
-  (public_name fixpoint)
-  (wrapped false)
-  (libraries camllib))
+ (name fixpoint)
+ (public_name fixpoint)
+ (wrapped false)
+ (libraries camllib))
