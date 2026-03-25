@@ -5,7 +5,7 @@ open Format
 module Alphabet = PLattice.MakeAlphabet (struct
     type t = char
 
-    let compare (x : t) (y : t) = Pervasives.compare x y
+    let compare (x : t) (y : t) = Stdlib.compare x y
     let sep = '#'
   end)
 
@@ -21,7 +21,7 @@ module Finite = struct
       ~sepbind:""
       ~lastbind:""
       pp_print_char
-      (fun fmt _ -> ())
+      (fun _ _ -> ())
       fmt
       letter
   ;;
@@ -310,10 +310,10 @@ module Int = struct
       then a2, b2
       else if is_bottom (a2, b2)
       then a1, b1
-      else Pervasives.min a1 a2, Pervasives.max b1 b2
+      else Stdlib.min a1 a2, Stdlib.max b1 b2
     ;;
 
-    let meet (a1, b1) (a2, b2) = Pervasives.max a1 a2, Pervasives.min b1 b2
+    let meet (a1, b1) (a2, b2) = Stdlib.max a1 a2, Stdlib.min b1 b2
 
     let widening (a1, b1) (a2, b2) =
       if not (is_leq (a1, b1) (a2, b2)) then failwith "";
@@ -325,12 +325,12 @@ module Int = struct
 
   let (lattice : (char, int * int) PLattice.glattice) =
     { PLattice.sep = L.sep
-    ; PLattice.is_bottom = (fun letter -> L.is_bottom)
-    ; PLattice.is_leq = (fun letter -> L.is_leq)
-    ; PLattice.is_eq = (fun letter -> L.is_eq)
-    ; PLattice.join = (fun letter -> L.join)
-    ; PLattice.meet = (fun letter -> L.meet)
-    ; PLattice.widening = (fun letter -> L.widening)
+    ; PLattice.is_bottom = (fun _ -> L.is_bottom)
+    ; PLattice.is_leq = (fun _ -> L.is_leq)
+    ; PLattice.is_eq = (fun _ -> L.is_eq)
+    ; PLattice.join = (fun _ -> L.join)
+    ; PLattice.meet = (fun _ -> L.meet)
+    ; PLattice.widening = (fun _ -> L.widening)
     }
   ;;
 

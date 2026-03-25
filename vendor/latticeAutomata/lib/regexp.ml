@@ -93,7 +93,7 @@ let rec simplify_concat (letter_equal : 'a -> 'a -> bool) (lexp : 'a exp list)
    *)
   match lexp with
   | [] -> []
-  | [ e ] as l -> l
+  | [ _ ] as l -> l
   | e1 :: (e2 :: rest2 as rest1) ->
     (match e1, e2 with
      | Star x, Star y when exp_equal letter_equal x y ->
@@ -115,8 +115,8 @@ let rec simplify_concat (letter_equal : 'a -> 'a -> bool) (lexp : 'a exp list)
 let rec remove_doublons (letter_equal : 'a -> 'a -> bool) (l : 'a list) : 'a list =
   match l with
   | [] -> []
-  | [ x ] -> l
-  | x :: (y :: rest2 as rest1) ->
+  | [ _ ] -> l
+  | x :: (y :: _ as rest1) ->
     if letter_equal x y
     then remove_doublons letter_equal rest1
     else x :: remove_doublons letter_equal rest1
@@ -165,13 +165,13 @@ let simplify (letter_equal : 'a -> 'a -> bool) (expr : 'a t) : 'a t =
       let lexp = List.map simp lexp in
       (* we split into non-epsilon and epsilon *)
       let lexp, leps = List.partition (fun exp -> exp <> Epsilon) lexp in
-      let lexp = simplify_union letter_equal (List.sort Pervasives.compare lexp) in
+      let lexp = simplify_union letter_equal (List.sort Stdlib.compare lexp) in
       let lexp =
         if leps = []
         then lexp
         else (
           match lexp with
-          | [ Star x ] | [ Plus x ] -> lexp
+          | [ Star _ ] | [ Plus _ ] -> lexp
           | _ -> Epsilon :: lexp)
       in
       (match lexp with

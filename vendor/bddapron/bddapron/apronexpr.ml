@@ -702,11 +702,11 @@ module Tree = struct
       | Var _, _ -> -1
       | Unop _, Cst _ | Unop _, Var _ -> 1
       | Unop (op1, e1, t1, r1), Unop (op2, e2, t2, r2) ->
-        let res = Pervasives.compare (op1, t1, r1) (op2, t2, r2) in
+        let res = Stdlib.compare (op1, t1, r1) (op2, t2, r2) in
         if res <> 0 then res else compare e1 e2
       | Unop _, Binop _ -> -1
       | Binop (op1, ea1, eb1, t1, r1), Binop (op2, ea2, eb2, t2, r2) ->
-        let res = Pervasives.compare (op1, t1, r1) (op2, t2, r2) in
+        let res = Stdlib.compare (op1, t1, r1) (op2, t2, r2) in
         if res <> 0
         then res
         else (

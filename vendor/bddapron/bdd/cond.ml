@@ -104,7 +104,7 @@ let permutation t =
   let perm = Array.init (Cudd.Man.get_bddvar_nb t.cudd) (fun i -> i) in
   let index = ref t.bddindex0 in
   PDMappe.iter
-    (begin fun cond (id,b) ->
+    (begin fun _ (id,b) ->
       if b then begin
 	perm.(id) <- !index;
 	incr index;
@@ -186,8 +186,8 @@ let check_normalized (env:'b) (cond:('a,'b,'c,'d) t) : bool
   with Exit ->
     false
 
-let extend_with (env: (('a, _, _, _, _) Env.O.t as 'b))
-    ({ cudd; bddindex0; bddsize } as cond: ('a, 'b, 'c, 'd) t) size =
+let extend_with (_: (('a, _, _, _, _) Env.O.t as 'b))
+({ cudd; bddindex0; bddsize; _ } as cond: ('a, 'b, 'c, 'd) t) size =
   cond.bddsize <- bddsize + size;
   for i = bddindex0 + bddsize to bddindex0 + bddsize + size - 1
   do ignore (Cudd.Bdd.ithvar cudd i) done;
@@ -245,7 +245,7 @@ let compute_careset
     if normalized then list
     else
       List.fast_sort
-	(fun (cons1,idb1) (cons2,idb2) -> t.compare_cond cons1 cons2)
+	(fun (cons1,_) (cons2,_) -> t.compare_cond cons1 cons2)
 	list
   in
   if false then begin
@@ -253,7 +253,7 @@ let compute_careset
       (Print.list (fun fmt (_,(id,b)) -> fprintf fmt "(%i,%b)" id b)) list
   end;
   let rec parcours lblock currentblock = function
-    | ((cons1,idb1) as x1)::( ((cons2,idb2)::_) as rest) ->
+    | ((cons1,_) as x1)::( ((cons2,_)::_) as rest) ->
 	let cmp = t.compare_cond cons1 cons2 in
 	if cmp=(-3) then
 	  let currentblock = List.rev (x1::currentblock) in
@@ -358,8 +358,8 @@ let lce (cond1:('a,'b,'c,'d) t) (cond2:('a,'b,'c,'d) t) : ('a,'b,'c,'d) t =
       map12
     in
     let cond = copy cond1 in
-    cond.bddindex0 <- Pervasives.max cond1.bddindex0 cond2.bddindex0;
-    cond.bddsize <- Pervasives.max cond1.bddsize cond2.bddsize;
+    cond.bddindex0 <- Stdlib.max cond1.bddindex0 cond2.bddindex0;
+    cond.bddsize <- Stdlib.max cond1.bddsize cond2.bddsize;
     clear cond;
     PMappe.iter
       (begin fun pcond (k,id) ->
@@ -383,7 +383,7 @@ let permutation12 (cond1:('a,'b,'c,'d) t) (cond2:('a,'b,'c,'d) t) : int array
   let perm = Array.init (Cudd.Man.get_bddvar_nb cond1.cudd) (fun i -> i) in
   let offset = ref (cond2.bddindex0 - cond1.bddindex0) in
   PMappe.iter
-    (begin fun cons2 (id2,b2) ->
+    (begin fun cons2 (_,b2) ->
       if b2 then begin
 	try
 	  let (id1,b1) = PDMappe.y_of_x cons2 cond1.condidb in
@@ -403,7 +403,7 @@ let permutation21 (cond2:('a,'b,'c,'d) t) (cond1:('a,'b,'c,'d) t) : int array
   let perm = Array.init (Cudd.Man.get_bddvar_nb cond2.cudd) (fun i -> i) in
   let offset = ref (cond2.bddindex0 - cond1.bddindex0) in
   PMappe.iter
-    (begin fun cons2 (id2,b2) ->
+    (begin fun cons2 (_,b2) ->
       if b2 then begin
 	try
 	  let (id1,b1) = PDMappe.y_of_x cons2 cond1.condidb in

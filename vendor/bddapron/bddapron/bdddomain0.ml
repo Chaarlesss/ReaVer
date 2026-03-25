@@ -391,7 +391,7 @@ module O = struct
        canonicalize man t2;
        List.length t1.list = List.length t2.list
        &&
-       let cmp_elt elt1 elt2 = Pervasives.compare elt1.guard elt2.guard in
+       let cmp_elt elt1 elt2 = Stdlib.compare elt1.guard elt2.guard in
        let list1 = List.fast_sort cmp_elt t1.list in
        let list2 = List.fast_sort cmp_elt t2.list in
        try

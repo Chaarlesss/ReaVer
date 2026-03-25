@@ -377,7 +377,7 @@ module Make
 	  end;
 	  det = false;
 	  min = false;
-	  counter = Pervasives.max
+	  counter = Stdlib.max
 	  auto1.FGraph.info.counter
 	  auto2.FGraph.info.counter;
 	}
@@ -1406,7 +1406,7 @@ module Make
       (* implementation of Kleene's method on the reduced set of vertices *)
 	let nb_v = Graph.size_vertex !graph in
 	let tab_v = Array.make nb_v 0 in
-	let k= ref 0 in Graph.iter_vertex !graph (fun x l ~pred ~succ -> tab_v.(!k) <- x ; incr k);
+	let k= ref 0 in Graph.iter_vertex !graph (fun x _ ~pred:_ ~succ:_ -> tab_v.(!k) <- x ; incr k);
 	(* tab_v is needed because the identifier of the vertices may be greater than nb_v *)
 	let v i : int= tab_v.(i) in
 
@@ -1506,8 +1506,8 @@ module Make
       let info = Graph.info auto in
       let dim = Array.length info.initial in
       Graph.transpose auto
-	(fun vertex attrvertex ~pred ~succ -> dim-1-attrvertex)
-	(fun edge attredge -> attredge)
+	(fun _ attrvertex ~pred:_ ~succ:_ -> dim-1-attrvertex)
+	(fun _ attredge -> attredge)
 	(fun info -> { info with
 	  det = false;
 	  min = false;
@@ -1790,7 +1790,7 @@ module Make
 	let info2 = Graph.info auto2 in
 	let dim1 = Array.length info1.initial in
 	let dim2 = Array.length info2.initial in
-	let auto2bis = Graph.map_vertex auto2 (fun _ d ~pred ~succ -> d + dim1-1) in
+	let auto2bis = Graph.map_vertex auto2 (fun _ d ~pred:_ ~succ:_ -> d + dim1-1) in
 	  (* change the attributes of the vertices of auto2r to add dim1-1 *)
 	let auto1r = Graph.repr auto1 in
 	let auto2r = Graph.repr auto2bis in
@@ -1801,7 +1801,7 @@ module Make
 	  FGraph.info = { (auto1r.FGraph.info) with
 			    det = false;
 			    min = false;
-			    counter = Pervasives.max
+			    counter = Stdlib.max
 	      auto1r.FGraph.info.counter
 	      auto2r.FGraph.info.counter;
 			}
@@ -2314,7 +2314,7 @@ module Make
       let list = ref [] in
 
       MappeI.iter
-	(begin fun id pvertex ->
+	(begin fun _ pvertex ->
 	  list := [];
 	  SetteI.iter
 	    (begin fun vertex ->
@@ -2339,7 +2339,7 @@ module Make
 	    pvertex
 	  ;
 	  List.iter
-	    (begin fun (letters,rset) ->
+	    (begin fun (_,rset) ->
 	      incr counter;
 	      newclasses := MappeI.add !counter !rset !newclasses
 	    end)
@@ -2392,7 +2392,7 @@ module Make
       let info = Graph.info auto in
       let dim = Array.length info.initial in
 
-      let f_vertex x i ~pred ~succ res_map =
+      let f_vertex x i ~pred:_ ~succ:_ res_map =
 	(* computes both languages for state x, and add this information in res_map *)
 	let init_lang_fwd =
 	  if final 
@@ -2454,7 +2454,7 @@ module Make
 
       let map_res = ref mappe_init in
 
-      let f_iter_vertex old_map k_fwd k_bwd x i ~pred ~succ =
+      let f_iter_vertex old_map k_fwd k_bwd x _ ~pred ~succ =
 	let (old_set_forward,old_set_backward) = 
 	  try Mappe.find x old_map
 	  with Not_found -> failwith "bug refine_partition_bounded, bug 1"
@@ -2596,7 +2596,7 @@ module Make
       let map_partition = ref MappeI.empty in
 	(* map partition : vertex -> nb_class *)
 
-      let f_iter_vertex x i ~pred ~succ =
+      let f_iter_vertex x i ~pred:_ ~succ:_ =
 	let (lang_fwd_loc,lang_bwd_loc) = 
 	  try Mappe.find x mappe_lang_local
 	  with Not_found -> failwith "bug construct_partition_bounded,bug1"

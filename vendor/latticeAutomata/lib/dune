@@ -2,7 +2,7 @@
  (name latticeAutomata)
  (public_name latticeAutomata)
  (wrapped false)
- (libraries camllib stdlib-shims))
+ (libraries camllib))
 
 (env
  (dev

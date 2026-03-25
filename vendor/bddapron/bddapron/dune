@@ -1,7 +1,7 @@
 (library
  (name bddapron)
  (public_name bddapron.bddapron)
- (libraries cudd bdd num gmp apron))
+ (libraries cudd bdd zarith gmp apron))
 
 (env
  (dev

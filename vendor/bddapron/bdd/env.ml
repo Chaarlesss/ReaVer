@@ -6,7 +6,7 @@
 open Format
 
 (*  ********************************************************************** *)
-(** {3 Datatypes } *)
+(** {3 Datatypes} *)
 (*  ********************************************************************** *)
 
 exception Bddindex
@@ -94,16 +94,15 @@ type ('a, 'b, 'c, 'd, 'e) t0 =
   ; mutable bddindex0 : int (** First index for finite-type variables *)
   ; mutable bddsize : int (** Number of indices dedicated to finite-type variables *)
   ; mutable bddindex : int (** Next free index in BDDs used by [self#add_var]. *)
-  ; mutable bddincr : int (** Increment used by {!add_var} for incrementing
-	[bddindex] *)
+  ; mutable bddincr : int (** Increment used by {!add_var} for incrementing [bddindex] *)
   ; mutable idcondvar : (int, 'a) PMappe.t
     (** Associates to a BDD index the variable involved by it *)
   ; mutable vartid : ('a, int array) PMappe.t
     (** (Sorted) array of BDD indices associated to finite-type variables. *)
   ; mutable groups : 'a group_tree list
   ; mutable print_external_idcondb : Format.formatter -> int * bool -> unit
-    (** Printing conditions not managed by the environment..
-	By default, [pp_print_int]. *)
+    (** Printing conditions not managed by the environment.. By default,
+          [pp_print_int]. *)
   ; mutable ext : 'e
   ; symbol : 'a symbol
   ; copy_ext : 'e -> 'e
@@ -216,7 +215,7 @@ let marshal s = string_remove_null (Marshal.to_string s [ Marshal.No_sharing ])
 let unmarshal s = Marshal.from_string (string_add_null s) 0
 
 let make_symbol
-      ?(compare = Pervasives.compare)
+      ?(compare = Stdlib.compare)
       ?(marshal = marshal)
       ?(unmarshal = unmarshal)
       print
@@ -258,7 +257,7 @@ module O = struct
       env.ext
   ;;
 
-  let clear_groups { cudd; bddindex0; bddsize } = Cudd.Man.ungroupall cudd
+  let clear_groups { cudd; _ } = Cudd.Man.ungroupall cudd
   (* ; *)
   (* Cudd.Man.group cudd bddindex0 bddsize Cudd.Man.MTR_DEFAULT *)
 
@@ -296,11 +295,11 @@ module O = struct
     e
   ;;
 
-  let fix_var_bits { cudd } tid =
+  let fix_var_bits { cudd; _ } tid =
     Cudd.Man.group cudd tid.(0) (Array.length tid) Cudd.Man.MTR_FIXED
   ;;
 
-  let rebuild_groups ({ cudd; groups } as env) =
+  let rebuild_groups ({ cudd; groups; _ } as env) =
     clear_groups env;
     let rec setup_gt = function
       | Var (_, _, 1) -> ()
@@ -330,7 +329,7 @@ let typ_of_var env label : 'a =
     notfound "Bdd.Env.typ_of_var: unknwon label/variable %a" env.symbol.print label
 ;;
 
-let print_idcondb env fmt ((id, b) as idb) =
+let print_idcondb env fmt ((id, _) as idb) =
   try
     let var = PMappe.find id env.idcondvar in
     let tid = PMappe.find var env.vartid in
@@ -358,7 +357,7 @@ let print_order env (fmt : Format.formatter) : unit =
       let level = Cudd.Man.level_of_var cudd var in
       var, level)
   in
-  Array.sort (fun (v1, l1) (v2, l2) -> Pervasives.compare l1 l2) tab;
+  Array.sort (fun (_, l1) (_, l2) -> Stdlib.compare l1 l2) tab;
   Print.array
     ~first:"@[<v>"
     ~sep:"@ "
@@ -384,7 +383,7 @@ let print fmt (env : ('a, 'b, 'c, 'd, 'e) O.t) =
 ;;
 
 let make ~symbol ?bddindex0 ?bddsize ?relational cudd =
-  O.make ~symbol ~copy_ext:(fun x -> ()) ?bddindex0 ?bddsize ?relational cudd ()
+  O.make ~symbol ~copy_ext:(fun _ -> ()) ?bddindex0 ?bddsize ?relational cudd ()
 ;;
 
 let make_string ?bddindex0 ?bddsize ?relational cudd =
@@ -443,7 +442,7 @@ let pack_gtl ?full env (gtl : 'a group_tree list as 'b) : int array * 'b =
     i, List.rev gtl
   in
   let index, gtl = pack_gtl ?full env.bddindex0 gtl in
-  let index, gtl =
+  let _, gtl =
     if index >= env.bddindex0 + env.bddsize && full = Some false
     then pack_gtl ~full:true env.bddindex0 gtl
     else index, gtl
@@ -496,7 +495,7 @@ let check_normalized (env : ('a, 'b, 'c, 'd, 'e) O.t) : bool =
   try
     let index = ref env.bddindex0 in
     PMappe.iter
-      (fun var tid ->
+      (fun _ tid ->
          Array.iter
            (fun id ->
               if id <> !index
@@ -568,7 +567,7 @@ let vars env = PMappe.maptoset env.vartid
 
 let labels env =
   PMappe.fold
-    (fun typ def res ->
+    (fun _ def res ->
        match def with
        | `Benum tlabel -> Array.fold_right PSette.add tlabel res
        | _ -> res)
@@ -727,7 +726,7 @@ type packing =
   ]
 
 let add_vars_with
-      ({ bddindex; idcondvar; vartyp; vartid; groups } as env)
+      ({ bddindex; idcondvar; vartyp; vartid; groups; _ } as env)
       ?booking_factor
       ?(packing = `Normalize)
       lvartyp
@@ -815,7 +814,7 @@ let rename_vars_with env lvarvar : int array option =
        env.vartyp <- PMappe.add nvar typ env.vartyp)
     lvarvartyp;
   List.iter
-    (fun (var, nvar, typ, tid, oset) ->
+    (fun (var, nvar, typ, tid, _) ->
        if PMappe.mem nvar env.vartyp
        then
          failwith
@@ -972,8 +971,8 @@ let lce env1 env2 : ('a, 'b, 'c, 'd, 'e) O.t =
     let env = copy env1 in
     env.typdef <- typdef;
     env.vartyp <- labeltyp;
-    env.bddindex0 <- Pervasives.max env1.bddindex0 env2.bddindex0;
-    env.bddsize <- Pervasives.max env1.bddsize env2.bddsize;
+    env.bddindex0 <- Stdlib.max env1.bddindex0 env2.bddindex0;
+    env.bddsize <- Stdlib.max env1.bddsize env2.bddsize;
     env.bddindex <- env.bddindex0;
     env.idcondvar <- PMappe.empty ( - );
     env.vartid <- PMappe.empty env1.symbol.compare;
@@ -1063,7 +1062,7 @@ let compute_change env1 env2 =
       let cudd = env1.cudd in
       let supp = ref (Cudd.Bdd.dtrue cudd) in
       PMappe.iter
-        (fun var tid ->
+        (fun _ tid ->
            Array.iter
              (fun id -> supp := Cudd.Bdd.dand !supp (Cudd.Bdd.ithvar cudd id))
              tid)

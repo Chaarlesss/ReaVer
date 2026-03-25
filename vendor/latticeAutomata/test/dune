@@ -1,6 +1,6 @@
 (test
  (name essai)
- (libraries latticeAutomata stdlib-shims))
+ (libraries latticeAutomata))
 
 (env
  (dev

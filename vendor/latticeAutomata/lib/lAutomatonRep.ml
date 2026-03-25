@@ -62,8 +62,8 @@ type pinfo = {
 
 (* Return an empty pinfo *)
 let make_pinfo dim =  {
-  pinitial = Array.create dim SetteI.empty;
-  pfinal = Array.create dim SetteI.empty;
+  pinitial = Array.make dim SetteI.empty;
+  pfinal = Array.make dim SetteI.empty;
   hashPI = Hashhe.create 7;
   pcounter = 0
 }
@@ -485,12 +485,12 @@ module Make
 
   let (lunit:'a PL.lattice) = {
     PLattice.sep = ();
-    PLattice.is_bottom = begin fun letter () -> false end;
-    PLattice.is_leq = begin fun letter () () -> true end;
-    PLattice.is_eq = begin fun letter () () -> true end;
-    PLattice.join = begin fun letter () () -> () end;
-    PLattice.meet = begin fun letter () () -> () end;
-    PLattice.widening = begin fun letter () () -> () end;
+    PLattice.is_bottom = begin fun _ () -> false end;
+    PLattice.is_leq = begin fun _ () () -> true end;
+    PLattice.is_eq = begin fun _ () () -> true end;
+    PLattice.join = begin fun _ () () -> () end;
+    PLattice.meet = begin fun _ () () -> () end;
+    PLattice.widening = begin fun _ () () -> () end;
   }
 
   (*  ==================================================================== *)
@@ -527,7 +527,7 @@ module Make
       let s = (string_of_int vertex)^"  "^(string_of_int i)^s1^s2 in
       Format.pp_print_string fmt s
     in
-    let print_edge fmt edge attredge =
+    let print_edge fmt _ attredge =
       ignore (Format.flush_str_formatter ());
       fprintf Format.str_formatter "@[<v>%a@]" print_letter attredge;
       Format.pp_print_string fmt (Print.escaped ~linebreak:'l' (Format.flush_str_formatter ()))
@@ -558,8 +558,8 @@ module Make
     let info = {
       lattice = lattice;
       partition = partition;
-      initial = Array.create dim SetteI.empty ;
-      final = Array.create dim SetteI.empty;
+      initial = Array.make dim SetteI.empty ;
+      final = Array.make dim SetteI.empty;
       det = true ;
       min = true ;
       counter = 0;
@@ -689,8 +689,8 @@ module Make
 
   let shape (auto:'a t) : shape  =
     let shape = Graph.map_edge auto
-      (begin fun edge pelt ->
-	A.Map.map (fun elt -> ()) pelt
+      (begin fun _ pelt ->
+	A.Map.map (fun _ -> ()) pelt
       end)
     in
     let shape = Graph.map_info shape
@@ -707,7 +707,7 @@ module Make
     Array.length info.initial
 
   let nb_states (auto:'a t) : int =
-    Graph.fold_vertex auto 0 (fun _ _ ~pred ~succ n -> n+1)
+    Graph.fold_vertex auto 0 (fun _ _ ~pred:_ ~succ:_ n -> n+1)
 
 
   (*  ==================================================================== *)
@@ -1069,7 +1069,7 @@ module Make
 	      pinfo.pcounter <- pinfo.pcounter + 1;
 	      pinfo.pcounter - 1
 	  | Some x ->
-	      pinfo.pcounter <- Pervasives.max pinfo.pcounter (x+1);
+	      pinfo.pcounter <- Stdlib.max pinfo.pcounter (x+1);
 	      x
 	in
 	pauto := Graph.add_vertex !pauto index i;
@@ -1197,7 +1197,7 @@ module Make
 	let mapA_LxP = succ_pvertex auto pvertex in
 	let mapA_LxV =
 	  A.Map.mapi
-	    (begin fun letter (elt,psucc) ->
+	    (begin fun _ (elt,psucc) ->
 	      let id_psucc = Powerset.add_pvertex auto pauto psucc in
 	      if not (HashheI.mem marked id_psucc) then
 		explore_pvertex id_psucc psucc
@@ -1304,7 +1304,7 @@ module Make
 	let mapA_LxP_list = succ_pvertex_partial auto pvertex in
 	let mapA_LxV_list =
 	  A.Map.mapi
-	    (begin fun letter leltpsucc ->
+	    (begin fun _ leltpsucc ->
 	      List.map
 	      (begin fun (elt,psucc) ->
 		let id_psucc = Powerset.add_pvertex auto pauto psucc in
@@ -1346,7 +1346,7 @@ module Make
       try
 	if (SetteI.cardinal info.initial.(0))>1 then raise Exit;
 	Graph.iter_vertex auto
-	  (begin fun vertex _ ~pred ~succ ->
+	  (begin fun vertex _ ~pred:_ ~succ ->
 	    Det.raise_exit_if_vertex_not_deterministic auto vertex ~succ
 	  end)
 	;
@@ -1535,7 +1535,7 @@ module Make
 	    in
 	    let lset = 
 	      MappeI.fold
-		(begin fun id_psucc rset lset ->
+		(begin fun _ rset lset ->
 		  !rset :: lset
 		end)
 		mapV_P
@@ -1775,15 +1775,15 @@ module Make
       =
       let info1 = Graph.info auto1 in
       let info2 = Graph.info auto2 in
-      let array_pvertex2 = Array.create (Array.length info1.initial) SetteI.empty in
+      let array_pvertex2 = Array.make (Array.length info1.initial) SetteI.empty in
       Graph.iter_vertex auto2
-	(begin fun vertex2 i2 ~pred ~succ ->
+	(begin fun vertex2 i2 ~pred:_ ~succ:_ ->
 	  array_pvertex2.(i2) <- SetteI.add vertex2 array_pvertex2.(i2)
 	end)
       ;
       let current = ref MappeI.empty in
       Graph.iter_vertex auto1
-	(begin fun vertex1 i ~pred ~succ ->
+	(begin fun vertex1 i ~pred:_ ~succ:_ ->
 	  let set2 = 
 	    if SetteI.mem vertex1 info1.final.(i) then
 	      info2.final.(i)

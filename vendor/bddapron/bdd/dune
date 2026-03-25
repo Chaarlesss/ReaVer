@@ -1,20 +1,7 @@
 (library
  (name bdd)
  (public_name bddapron.bdd)
- (libraries cudd camllib)
- (modules
-  cond
-  decompose
-  domain0
-  domain1
-  enum
-  env
-  expr0
-  expr1
-  int
-  normalform
-  output
-  reg))
+ (libraries cudd camllib))
 
 (env
  (dev

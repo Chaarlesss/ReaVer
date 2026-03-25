@@ -33,8 +33,7 @@
   statistic
   time
   rational
-  parse)
- (libraries stdlib-shims))
+  parse))
 
 (env
  (dev
