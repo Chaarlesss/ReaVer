@@ -15,7 +15,6 @@
    (>= 20151015))
   dune
   camllib
-  (mlcuddidl
-   (>= 2.3.0))
+  mlcuddidl
    mlgmpidl
   (odoc :with-doc)))

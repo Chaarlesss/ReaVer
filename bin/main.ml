@@ -7,6 +7,8 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
+open Reaver
+
 let version = "0.9.3"
 
 let logger =

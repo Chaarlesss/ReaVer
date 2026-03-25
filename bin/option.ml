@@ -7,6 +7,8 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
+open Reaver
+
 exception InvalidArgs
 exception HelpAndExit
 

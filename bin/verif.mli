@@ -2,6 +2,7 @@
    Please read the LICENSE file packaged in the distribution *)
 
 (** ReaVer verification main loop *)
+open Reaver
 
 (** invalid verification strategy *)
 exception InvalidStrategy of string 

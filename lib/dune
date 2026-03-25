@@ -11,10 +11,7 @@
   apron.octMPQ
   apron.boxMPQ
   bddapron.bdd
-  str)
- (wrapped false)
- (modules
-  (:standard \ stratiter stratiter2 stratiter3 powerCons)))
+  str))
 
 (env
  (dev

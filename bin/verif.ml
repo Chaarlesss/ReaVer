@@ -7,6 +7,8 @@
    Please read the LICENSE file packaged in the distribution *)
 (******************************************************************************)
 
+open Reaver
+
 let logger =
   { Log.fmt = Format.std_formatter; Log.module_name = "Verif"; Log.level = Log.Debug }
 ;;

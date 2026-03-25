@@ -2,6 +2,7 @@
    Please read the LICENSE file packaged in the distribution *)
 
 (** ReaVer DF to CF transformation *)
+open Reaver
 
 (** invalid DF to CF transformation *)
 exception InvalidDf2cf of string
